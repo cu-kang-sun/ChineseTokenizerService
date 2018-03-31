@@ -1,0 +1,56 @@
+body {
+
+    background-color: #f0f0f0;
+    margin: 0px;
+    overflow: hidden;
+}
+
+#info {
+    position: relative;
+    bottom: 10px;
+    text-align: center;
+}
+
+#tool {
+    min-width: 300px;
+}
+
+.char-active{
+    font-weight: 900;
+    background-color: #fa4444;
+    color: white
+}
+
+.chars{
+    margin: 0;
+}
+
+.char{
+    margin-left: 2px;
+    padding: 2px 2px;
+    font-size: 0.8em;
+}
+.char:hover{
+    cursor: pointer;
+}
+
+.word{
+    margin-right: 0.3em;
+    display: inline-block;
+}
+
+.refer{
+    margin-right: 0.3em;
+    display: inline-block;
+}
+
+.plain{
+    word-break: keep-all;
+    white-space: nowrap;
+}
+
+#chars{
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+}

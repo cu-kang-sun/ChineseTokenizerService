@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <link href="/bootstrap.css" rel="stylesheet">
+    <link href="/style.css" rel="stylesheet">
+    <script src="/jquery.min.js"></script>
+    <script src="/vue.js"></script>
+    <title>Title</title>
+</head>
+<body>
+<!--<div id="canvas-frame" style="width: 100vw; height: 100vh"></div>-->
+<!--<h2>鼠标左键-旋转；右键-平移；滚轮-缩放</h2>-->
+<div id="control-panel">
+    <div class="row">
+        <div class="col-xs-5">
+            <div id="tool" class="input-group">
+                <div class="input-group-btn">
+                    <button class="btn btn-default" v-on:click="historyLast();" type="button">&lt;</button>
+                    <button class="btn btn-default" v-on:click="historyNext();" type="button">&gt;</button>
+                </div>
+                <input v-model="inputSentence" v-on:keyup.enter="onSubmit();" class="form-control" placeholder="输入待分词句子" type="text"
+                       id="sentence-input">
+                <div class="input-group-btn">
+                    <button class="btn btn-primary" v-on:click="randomGet();" type="button" title="需要软院VPN连接">获取</button>
+                    <button class="btn btn-info" v-on:click="onSubmit();" type="button" id="submit-btn">提交</button>
+                </div>
+            </div>
+
+            <label> 上接字:
+                <button @click="changeNbrState(false);" class="btn btn-sm btn-default" :class="{'btn-success': inState.show()}">{{inState.text()}}</button>
+            </label>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <label> 下接字:
+                <button @click="changeNbrState(true);" class="btn btn-sm btn-default" :class="{'btn-success': outState.show()}">{{outState.text()}}</button>
+            </label>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label> 参考标准:
+                <button @click="changeRefSource();" class="btn btn-sm btn-warning">{{refSource}} ({{ref.overlap}})</button>
+            </label>
+        </div>
+        <div class="col-xs-7" style="overflow-x: auto">
+
+            <h4 class="plain">
+                <small>分词结果</small>
+                <span class="label label-default word" v-for="word in words">{{word}}</span>
+            </h4>
+            <h4 class="plain">
+                <small>参考 {{refSource}}</small>
+                <span class="label label-success refer" v-for="word in ref.words">{{word}}</span>
+            </h4>
+        </div>
+    </div>
+    <h3 id="chars">
+            <span class="label label-default char" v-for="char in chars" @click="select(char)"
+                  :class="{'char-active': char.isActive}">
+                {{char.value}}
+            </span>
+    </h3>
+</div>
+
+
+<div id="space">
+    <!--<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - Simple text from json fonts.-->
+</div>
+
+<script src="/three.js"></script>
+<script src="/OrbitControls.js"></script>
+<script src="/engine.js"></script>
+<script>
+    var controller = new Vue({
+        el: "#control-panel",
+        data: {
+            inputSentence: "",
+            sentenceHistory: [],
+            sentenceHistoryItr: -1,
+            chars: [],
+            words: [],
+            refSource: "jieba",
+            ref: {words: [], overlap:"n/a"},
+            refCache: {jieba:{words: [], overlap:"n/a"}, thulac:{words: [], overlap:"n/a"}},
+            overlap: "N/A",
+            outState: {
+                show: function () {
+                    // 这里用了engine.js中的全局变量outNbrs，这样非常不好，有机会我会重构
+                    return outNbrs.show;
+                },
+                text: function () {
+                    return outNbrs.show?"开启":"关闭";
+                },
+                obj: outNbrs
+            },
+            inState: {
+                show: function () {
+                    return inNbrs.show;
+                },
+                text: function () {
+                    return inNbrs.show?"开启":"关闭";
+                },
+                obj: inNbrs
+            }
+        },
+        methods: {
+            select: function (char) {
+                this.chars.forEach(function (char) {
+                    char.isActive = false;
+                });
+                char.isActive = true;
+                console.log("select char #" + char.index);
+                var position = charPosition(char.index);
+                console.log(position);
+                camera.position.set(position.x - 13 * FONT_SIZE, position.y + 20, position.z + 20 * FONT_SIZE);
+                controls.target = new THREE.Vector3(position.x, position.y, position.z);
+            },
+
+            onSubmit: function () {
+                var sentence = this.inputSentence;
+                // var sentence = $("#sentence-input").val();
+                console.log("提交句子：" + sentence);
+                var self = this;
+                $.ajax({
+                    url: "/tokenize-result",
+                    dataType: 'json',
+                    data: {sentence: sentence},
+                    type: 'GET',
+                    success: function (res) {
+                        clearGraph();
+                        // debugger;
+                        var jieba = res.jieba;
+                        var thulac = res.thulac;
+                        controller.refCache.jieba = jieba;
+                        controller.refCache.thulac = thulac;
+                        var words = res.result;
+                        //console.log(jieba);
+                        //console.log(words);
+                        //console.log(overlap);
+                        // controller.chars = sentence.split("").map(function(char){return {value: char, isActive: false}});
+                        var chars = [];
+                        //console.log(res.graph);
+                        for (i in res.graph) {
+                            var tmp = {value: res.graph['' + i]['char'], isActive: false, index: i};
+                            chars.push(tmp);
+                        }
+                        controller.chars = chars;
+                        controller.ref = jieba;
+                        controller.words = words;
+                        loadTextGraph(res.graph);
+                        self.sentenceHistory.push(sentence);
+                        self.sentenceHistoryItr = self.sentenceHistory.length-1;
+                        // 注意，下一行代码没有意义，loadTextGraph中的逻辑是异步执行的
+                        // displayNbr(self.outState.show, self.inState.show)
+                    },
+                    error: function (res) {
+                        console.error(res);
+                    }
+                });
+            },
+
+            changeNbrState: function (isOut) {
+                var state = isOut?this.outState:this.inState;
+                state.obj.show = !state.obj.show;
+                // displayNbr(this.outState.show(), this.inState.show());
+                updateNbrDisplay();
+            },
+
+            changeRefSource: function () {
+                if(this.refSource === "jieba"){
+                    this.refSource = "thulac";
+                    this.ref = this.refCache["thulac"]
+                }else{
+                    this.refSource = "jieba";
+                    this.ref = this.refCache["jieba"]
+                }
+            },
+
+            historyNext: function () {
+                var itr = this.sentenceHistoryItr;
+                var history = this.sentenceHistory;
+                if(itr+1<history.length){
+                    this.inputSentence = history[itr+1];
+                    this.sentenceHistoryItr ++;
+
+                }
+            },
+
+            historyLast: function () {
+                if(this.sentenceHistory.length>0 && this.sentenceHistoryItr-1>=0){
+                    this.inputSentence = this.sentenceHistory[--this.sentenceHistoryItr];
+                }
+            },
+            
+            randomGet: function () {
+                var self = this;
+                $.ajax({
+                    url: "/sentence-for-analyse",
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (res) {
+                        self.inputSentence = res.text;
+                        console.log("获取以下数据：");
+                        console.log(res);
+                    },
+                    error: function () {
+                        alert("获取失败")
+
+                    }
+                });
+            }
+        }
+    })
+
+
+</script>
+</body>
+</html>

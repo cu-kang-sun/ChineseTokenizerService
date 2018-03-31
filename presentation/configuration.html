@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <link href="/bootstrap.css" rel="stylesheet">
+    <script src="/jquery.min.js"></script>
+    <script src="/vue.js"></script>
+
+    <title>ConfigurationPage</title>
+</head>
+
+
+<body>
+
+    <div>
+
+            <form action="upload" method=post enctype=multipart/form-data>
+                <p>
+                    <input type=file name=file>
+
+                                            <label>Input the database Name </label>
+                                            <input class="form-control" name="databaseName">
+
+
+                    <input type=submit value=Upload>
+                </p>
+            </form>
+    </div>
+
+
+    <div id="app">
+<div class="row">
+        <div class="col-lg-6">
+        <div class="form-group">
+            <label>Select Text Library to Start Notation</label>
+            <select class="form-control" id="opts">
+                <option v-for="database in databases">{{ database }}</option>
+            </select>
+
+        </div>
+
+        <table id="labelTable" style="width:30%" border="1">
+                <thead>
+                    <tr>
+                        <th>Notation</th>
+                        <th>Label</th>
+                    </tr>
+                </thead>
+
+            <tbody>
+            <tr v-for="pair in pairs">
+                <th> <div class =" notationInTable" contenteditable> {{pair.notation}} </div> </th>
+                <th> <div class =" labelInTable" contenteditable> {{pair.label}}    </div> </th>
+            </tr>
+            </tbody>
+
+        </table>
+
+        <button class="btn btn-lg btn-primary" v-on:click="addOneRow();">增加一行</button>
+        <button class="btn btn-lg btn-primary" v-on:click="deleteLastRow();">删除最后行</button>
+
+        </br>
+
+        <button class="btn btn-lg btn-primary" v-on:click="startNotation();">开始标注</button>
+
+</div>
+
+
+    </div>
+    </div>
+
+
+    <script src="/configuration.js"></script>
+</body>
+</html>

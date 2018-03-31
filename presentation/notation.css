@@ -1,0 +1,87 @@
+.sentence {
+    overflow: hidden;
+    display: inline-block;
+}
+
+.sentence>li {
+    position: relative;
+    float: left;
+    margin: 5px 0;
+    padding: 0 0.1em;
+    list-style: none;
+    font-size: 2rem;
+    border-bottom: solid transparent 2px;
+}
+
+li:hover {
+    cursor: pointer;
+    border-radius: 5px;
+    /*background-color: lightgray;*/
+    /*border-bottom: solid black 2px;*/
+}
+
+#go-btn{
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    visibility: hidden;
+}
+
+/*.regulation{*/
+    /*background-color: orangered;*/
+    /*color: whitesmoke;*/
+/*}*/
+
+/*.location{*/
+    /*background-color: forestgreen;*/
+    /*color: whitesmoke;*/
+/*}*/
+
+/*.protagonist{*/
+    /*background-color: mediumslateblue;*/
+    /*color: whitesmoke;*/
+/*}*/
+
+.marked{
+    color:whitesmoke;
+}
+
+.peek {
+    background-color: lightgray;
+}
+
+.notation{
+    position: fixed;
+    padding: 0;
+}
+
+.notation li{
+    list-style: none;
+    /*padding: 5px 1em;*/
+}
+
+.notation .btn{
+    border-radius: 0;
+}
+
+body{
+    height: 100vh;
+}
+
+#controller{
+    position: relative;
+    /*top: 50%;*/
+    /*transform: translateY(-50%);*/
+    height: 100%;
+    text-align: center;
+}
+
+#controller>.row, #controller>.row>.col-xs-8{
+    height: 100%;
+    position: relative;
+}
+
+#controller .sentence{
+    position: relative;
+    margin-top: 10%
+}

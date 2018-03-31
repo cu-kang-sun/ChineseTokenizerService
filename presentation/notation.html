@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/notation.css">
+    <link href="/bootstrap.css" rel="stylesheet">
+    <script src="/jquery.min.js"></script>
+    <script src="/vue.js"></script>
+    <title>Title</title>
+</head>
+<body>
+<div id="controller">
+    <div class="row">
+        <div class="col-xs-8">
+            <ul class="sentence">
+
+                <li v-bind:class="ci.status" @mouseenter="peek(ci.index);" @click="select(ci.index);" v-for="ci in charInfos" >{{ci.char}}</li>
+
+                    <!--
+{peek: ci.isPeeked, location: ci.isLocation, regulation: ci.isRegulation, protagonist: ci.isProtagonist}
+{peek:ci.isPeeked,protagonist:ci.isProtagonist,location:ci.isLocation,regulation:ci.isRegulation,project:ci.isProject}
+            -->
+            </ul>
+            <br />
+            <button class="btn btn-lg btn-warning" @click="getRawSentence();">获取</button>
+            <button class="btn btn-lg btn-primary" @click="submit();">提交</button>
+            <button class="btn btn-lg btn-success" @click="exportNotation();">结束标注并导出文本</button>
+            <button class="btn btn-lg btn-info" @click="returnHome();">返回配置页面</button>
+        </div>
+
+
+        <div class="col-xs-4">
+            <ul  v-for = "label in labelPairs" class="list-group">
+                <li style="list-style: none">{{ label.notation }}</li>
+                <li class="list-group-item list-group-item-info" v-for="p in json[label.label].names">{{p.text}}</li>
+                <!--
+                <li style="list-style: none">地名</li>
+                <li class="list-group-item list-group-item-info" v-for="l in json.location.names">{{l.text}}</li>
+                <li style="list-style: none">法规名</li>
+                <li class="list-group-item list-group-item-info" v-for="r in json.regulation.names">{{r.text}}</li>
+
+                -->
+            </ul>
+        </div>
+    </div>
+    <br />
+
+    <button class="btn btn-lg btn-success" id="go-btn" @click="getRawSentence();">GO</button>
+    <ul class="notation" v-if="notation.visible" :style="{top: notation.y+'px', left:notation.x+'px'}">
+        <li>
+            <button @click="setState('cancel');" class="btn btn-md btn-default">取&nbsp;&nbsp;消</button>
+        </li>
+
+        <li v-for="label in labelPairs">
+            <button  @click="setState(label.label);" class="btn btn-md btn-primary">{{ label.notation}}</button>
+        </li>
+
+<!--
+        <li>
+            <button @click="setState('protagonist');" class="btn btn-md btn-primary">角&nbsp;&nbsp;色</button>
+        </li>
+        <li>
+            <button @click="setState('location');" class="btn btn-md btn-success">地&nbsp;&nbsp;点</button>
+        </li>
+        <li>
+            <button @click="setState('regulation');" class="btn btn-md btn-danger">法&nbsp;&nbsp;规</button>
+        </li>
+-->
+    </ul>
+</div>
+
+
+<script src="/notation.js"></script>
+</body>
+</html>
