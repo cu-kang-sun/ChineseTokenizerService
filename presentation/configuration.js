@@ -35,6 +35,19 @@ var app = new Vue({
 
         },
 
+        uploadFile: function(){
+            var self = this;
+            var file = document.getElementById('databaseName');
+            console.log(file);
+
+        },
+        abandonLabelChanges: function() {
+            location.reload();
+        }
+
+        ,
+
+
         getLabels: function () {
             var self = this;
             $.ajax({
@@ -54,8 +67,7 @@ var app = new Vue({
                 }
             });
         },
-
-        startNotation: function () {
+        submitLabelChanges:function(){
             inputLabels = [];
 
             var self = this;
@@ -71,9 +83,36 @@ var app = new Vue({
                 inputLabels.push(singlePair);
 
             }
+            actionData={};
+            actionData['labels']=JSON.stringify(inputLabels);
+            console.log(actionData);
+            $.ajax({
+                url: "/configuration/submit-label",
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify(actionData),
+                type: "POST",
+                success: function (res) {
+                     alert("您的标签已经被更新");
+
+                },
+                error: function (err) {
+                    alert("您的标签更新出现错误");
+                    console.log(err);
+
+                }
+            })
+
+
+
+
+        },
+
+        startNotation: function () {
+
 
             actionData = {};
-            actionData['labels']=JSON.stringify(inputLabels);
+
             actionData['database']=$( "#opts" ).val();
             console.log('actionData');
             console.log(actionData);

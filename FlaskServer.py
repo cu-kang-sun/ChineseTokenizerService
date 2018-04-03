@@ -46,7 +46,7 @@ def load_ref(loadfile):
 nio = NotationIO()
 nio_cursor = nio.get_raw_randomly()
 cursor = None
-
+0
 configIO = ConfigurationIO()
 database = ''
 
@@ -108,17 +108,11 @@ def fetch_label():
 
 
 
+@app.route('/configuration/submit-label', methods=['POST'])
+def submit_labels():
 
-#开始标注，提交标签与标签的对照表
-@app.route('/configuration/start-notation', methods=['POST'])
-def start_notation():
-    global cursor,database
     inputData = request.get_json()
     pairs = inputData.get("labels")
-    database = inputData.get("database")
-
-    cursor = nio.get_raw_randomly_fromDatabase(database)
-
 
 
     try:
@@ -127,6 +121,26 @@ def start_notation():
         return "500"
     else:
         return "200"
+
+
+
+
+
+#开始标注，提交标签与标签的对照表
+@app.route('/configuration/start-notation', methods=['POST'])
+def start_notation():
+    global cursor,database
+    inputData = request.get_json()
+    try:
+        database = inputData.get("database")
+
+        cursor = nio.get_raw_randomly_fromDatabase(database)
+    except:
+        return "500"
+    else:
+        return "200"
+
+
 
 
 @app.route('/notation', methods=['GET'])
