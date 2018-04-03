@@ -71,42 +71,105 @@
 
 
       <div class="panel panel-default">
-      <div class="panel-heading">标注与标签对照表</div>
+      <div class="panel-heading">标签编辑栏</div>
       <div class="panel-body">
-          <div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
 
-        <table id="labelTable"  class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline"
-               style="width:100%;table-layout:fixed;overflow:hidden;" border="1" >
+          <ul class="nav nav-tabs">
+                                <li class="active"><a href="#notation" data-toggle="tab" aria-expanded="true">标注标签编辑</a>
+                                </li>
+                                <li class=""><a href="#classification" data-toggle="tab" aria-expanded="false">分类标签编辑</a>
+                                </li>
+
+          </ul>
+
+          <div class="tab-content">
+                                <div class="tab-pane fade active in" id="notation">
+                                          <div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+
+                                                <table id="labelTable"  class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline"
+                                                       style="width:100%;table-layout:fixed;overflow:hidden;" border="1" >
 
 
 
-                <thead>
-                    <tr>
-                        <th>标注</th>
-                        <th>标签</th>
-                    </tr>
-                </thead>
+                                                        <thead>
+                                                            <tr>
+                                                                <th>标注</th>
+                                                                <th>标签</th>
+                                                            </tr>
+                                                        </thead>
 
-            <tbody>
+                                                    <tbody>
 
 
 
-            <tr v-for="pair in pairs">
-                <td> <div class =" notationInTable" contenteditable> {{pair.notation}} </div> </td>
-                <td> <div class =" labelInTable" contenteditable> {{pair.label}}    </div> </td>
-            </tr>
-            </tbody>
+                                                    <tr v-for="pair in pairs">
+                                                        <td> <div class =" notationInTable" contenteditable> {{pair.notation}} </div> </td>
+                                                        <td> <div class =" labelInTable" contenteditable> {{pair.label}}    </div> </td>
+                                                    </tr>
+                                                    </tbody>
 
-        </table>
+                                                </table>
 
-              <div class="row" style="margin: 0 auto;text-align: center;">
-                          <button class="btn btn-default btn-primary" v-on:click="addOneRow();">增加一行</button>
-                            <button class="btn btn-default btn-warning" v-on:click="deleteLastRow();">删除最后行</button>
-                  <button class="btn btn-default btn-danger" v-on:click="abandonLabelChanges();">放弃编辑</button>
-                  <button class="btn btn-default btn-success" v-on:click="submitLabelChanges();">提交编辑</button>
-              </div>
-          </div>
+                                                      <div class="row" style="margin: 0 auto;text-align: center;">
+                                                                  <button class="btn btn-default btn-primary" v-on:click="addOneRow();">增加一行</button>
+                                                                    <button class="btn btn-default btn-warning" v-on:click="deleteLastRow();">删除最后行</button>
+                                                          <button class="btn btn-default btn-danger" v-on:click="abandonLabelChanges();">放弃编辑</button>
+                                                          <button class="btn btn-default btn-success" v-on:click="submitLabelChanges();">提交编辑</button>
+                                                      </div>
+                                                  </div>
+                                </div>
+
+                                  <div class="tab-pane fade" id="classification">
+                                      <div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+
+                                                    <table id="categorynTable"  class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline"
+                                                           style="width:100%;table-layout:fixed;overflow:hidden;" border="1" >
+
+
+
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>类别</th>
+                                                                    <th>标签</th>
+                                                                </tr>
+                                                            </thead>
+
+                                                        <tbody>
+
+
+
+                                                        <tr v-for="category in categories">
+                                                            <td> <div class =" notationInTable" contenteditable> {{category.notation}} </div> </td>
+                                                            <td> <div class =" labelInTable" contenteditable> {{category.label}}    </div> </td>
+                                                        </tr>
+                                                        </tbody>
+
+                                                    </table>
+
+                                                          <div class="row" style="margin: 0 auto;text-align: center;">
+                                                                      <button class="btn btn-default btn-primary" v-on:click="addOneRow();">增加一行</button>
+                                                                        <button class="btn btn-default btn-warning" v-on:click="deleteLastRow();">删除最后行</button>
+                                                              <button class="btn btn-default btn-danger" v-on:click="abandonLabelChanges();">放弃编辑</button>
+                                                              <button class="btn btn-default btn-success" v-on:click="submitLabelChanges();">提交编辑</button>
+                                                          </div>
+                                                      </div>
+                                  </div>
+
+
+                            </div>
+
+
+
+
+
+
+
       </div>
+
+
+
+
+
       </div>
 
 
@@ -115,17 +178,17 @@
 
 
           <div class="panel panel-default">
-      <div class="panel-heading">选择数据库开始标注</div>
+      <div class="panel-heading">选择数据库开始工作</div>
       <div class="panel-body">
         <div class="form-group">
-            <span>选择您要标注的文本库</span>
+            <span>选择您要操作的文本库</span>
             <select class="form-control" id="opts">
                 <option v-for="database in databases">{{ database }}</option>
             </select>
 
         </div>
         <button class="btn btn-default btn-success" v-on:click="startNotation();">开始标注</button>
-
+          <button class="btn btn-default btn-warning" v-on:click="startClassification();">开始分类</button>
       </div>
           </div>
 
@@ -136,6 +199,8 @@
     </div>
 </div>
     <script src="/configuration.js"></script>
+    <script src="/bootstrap.js"></script>
+<script src="/bootstrap.min.js"></script>
 
 </body>
 </html>
