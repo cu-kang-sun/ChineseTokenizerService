@@ -41,15 +41,25 @@
 
 <!--action="upload"  method=post  -->
           <form action="upload"  method=post  enctype=multipart/form-data>
-                <p>
-                    <input id="database-file" type=file name=file>
+
+                    <input id="database-file" type=file name=file/>
                     </br>
                     <span>请输入您要创建的数据库名字</span>
-                    <input id="databaseName" class="form-control" name="databaseName">
+                    <input id="databaseName" class="form-control" name="databaseName"/>
                     </br>
-                   <input type=submit value="上传">
+                    <div class="form-group">
+                                            <span>请选择数据库类型</span>
+                                            <select class="form-control">
+                                                <option value="notation"> 标记</option>
+                                                <option value="classification">分类</option>
 
-                </p>
+                                            </select>
+                    </div>
+                </br>
+                   <input type=submit value="上传"/>
+
+
+
             </form>
 
 
@@ -76,9 +86,9 @@
 
 -->
           <ul class="nav nav-tabs" id="tabs">
-                                <li value="notation" class="active"  id="test"><a href="#notation" data-toggle="tab" aria-expanded="true">标注标签编辑</a>
+                                <li value="notation" class="active"  id="test"><a href="#notation" data-toggle="tab" aria-expanded="true">标注</a>
                                 </li>
-                                <li value="classification" class="" ><a href="#classification" data-toggle="tab" aria-expanded="false">分类标签编辑</a>
+                                <li value="classification" class="" ><a href="#classification" data-toggle="tab" aria-expanded="false">分类</a>
                                 </li>
           </ul>
 
@@ -90,6 +100,14 @@
 
                                 <div class="tab-pane fade active in" id="notation">
                                     <div class="panel panel-default">
+
+                                        <div class="panel-body">
+
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">标签编辑栏</div>
+
+
+                                        <div class="panel-collapse collapse in">
                                     <div class="panel-body">
                                           <div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
 
@@ -127,11 +145,53 @@
                                                       </div>
                                                   </div>
                                     </div>
+                                            </div>
+
+
+                                    </div>
+
+
+
+                                              <div class="panel panel-default">
+                                              <div class="panel-heading">选择数据库开始工作</div>
+                                                  <div class="panel-collapse collapse in">
+
+
+                                                      <div class="panel-body">
+                                                        <div class="form-group">
+                                                            <span>选择您要操作的文本库</span>
+                                                            <select class="form-control" id="opts">
+                                                                <option v-for="database in databases">{{ database }}</option>
+                                                            </select>
+
+                                                        </div>
+                                                        <button class="btn btn-default btn-success" v-on:click="startWork('notation');"                >开始标注</button>
+
+                                                      </div>
+                                                  </div>
+
+
+                                                  </div>
+
+
+
+
+                                        </div>
                                     </div>
                                 </div>
 
                                   <div class="tab-pane fade" id="classification">
+
+                                      <div class="panel panel-default">
+
+                                        <div class="panel-body">
+
+
                                     <div class="panel panel-default">
+                                        <div class="panel-heading">标签编辑栏</div>
+
+                                        <div class="panel-collapse collapse in">
+
                                       <div class="panel-body">
                                       <div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
 
@@ -169,7 +229,37 @@
                                                           </div>
                                                       </div>
                                       </div>
+                                        </div>
+
+
                                       </div>
+
+
+                                                <div class="panel panel-default">
+                                              <div class="panel-heading">选择数据库开始工作</div>
+
+                                                    <div class="panel-collapse collapse in">
+
+                                              <div class="panel-body">
+                                                <div class="form-group">
+                                                    <span>选择您要操作的文本库</span>
+                                                    <select class="form-control" id="opts">
+                                                        <option v-for="database in databases">{{ database }}</option>
+                                                    </select>
+
+                                                </div>
+
+                                                  <button class="btn btn-default btn-success" v-on:click="startWork('classification');"        >开始分类</button>
+                                              </div>
+
+                                                    </div>
+
+                                                  </div>
+
+                                  </div>
+                                </div>
+
+
                                   </div>
 
 
@@ -196,21 +286,6 @@
 
 
 
-
-          <div class="panel panel-default">
-      <div class="panel-heading">选择数据库开始工作</div>
-      <div class="panel-body">
-        <div class="form-group">
-            <span>选择您要操作的文本库</span>
-            <select class="form-control" id="opts">
-                <option v-for="database in databases">{{ database }}</option>
-            </select>
-
-        </div>
-        <button class="btn btn-default btn-success" v-on:click="startWork('notation');"                >开始标注</button>
-          <button class="btn btn-default btn-warning" v-on:click="startWork('classification');"        >开始分类</button>
-      </div>
-          </div>
 
 
 
