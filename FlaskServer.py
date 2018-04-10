@@ -46,7 +46,7 @@ def load_ref(loadfile):
 nio = NotationIO()
 nio_cursor = nio.get_raw_randomly()
 cursor = None
-0
+category = ''
 configIO = ConfigurationIO()
 database = ''
 
@@ -105,6 +105,18 @@ def fetch_label():
     print(json.dumps(labels,ensure_ascii=False))
     return json.dumps(labels,ensure_ascii=False)
 
+#按照类别查询标注-标签对照表
+@app.route('/configuration/getLabelsByCategory', methods=['POST'])
+def fetch_label_byCategory():
+    inputData = request.get_json()
+    category = inputData.get("category")
+    print("get labels by category:")
+    print(category)
+
+    labels = configIO.getLabelsByCategory(category)
+    print(json.dumps(labels,ensure_ascii=False))
+    return json.dumps(labels,ensure_ascii=False)
+
 
 
 
@@ -113,10 +125,11 @@ def submit_labels():
 
     inputData = request.get_json()
     pairs = inputData.get("labels")
+    category = inputData.get("category")
 
 
     try:
-        configIO.insertLabels(pairs)
+        configIO.insertLabels(pairs,category)
     except:
         return "500"
     else:
@@ -129,11 +142,15 @@ def submit_labels():
 #开始标注，提交标签与标签的对照表
 @app.route('/configuration/start-notation', methods=['POST'])
 def start_notation():
-    global cursor,database
+    global cursor,database, category
     inputData = request.get_json()
     try:
         database = inputData.get("database")
-
+        genre = inputData.get("category")
+        print(genre)
+        category = genre
+        print("now determine the global category!")
+        print(category)
         cursor = nio.get_raw_randomly_fromDatabase(database)
     except:
         return "500"
@@ -141,6 +158,10 @@ def start_notation():
         return "200"
 
 
+@app.route('/configuration/get-category', methods=['GET'])
+def get_category():
+    global category
+    return category
 
 
 @app.route('/notation', methods=['GET'])

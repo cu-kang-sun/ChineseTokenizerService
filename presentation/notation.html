@@ -9,15 +9,11 @@
     <title>Title</title>
 </head>
 <body>
-<nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
             <div class="navbar-header">
-
                 <a class="navbar-brand">文本标注辅助系统</a>
             </div>
             <!-- /.navbar-header -->
-
-
-
         </nav>
 
 <div id="controller">
@@ -41,43 +37,49 @@
 
 
         <div class="col-xs-4">
-            <ul  v-for = "label in labelPairs" class="list-group">
-                <li style="list-style: none">{{ label.notation }}</li>
-                <li class="list-group-item list-group-item-info" v-for="p in json[label.label].names">{{p.text}}</li>
-                <!--
-                <li style="list-style: none">地名</li>
-                <li class="list-group-item list-group-item-info" v-for="l in json.location.names">{{l.text}}</li>
-                <li style="list-style: none">法规名</li>
-                <li class="list-group-item list-group-item-info" v-for="r in json.regulation.names">{{r.text}}</li>
 
-                -->
-            </ul>
+            <template v-if="category === 'notation'">
+                <ul  v-for = "label in labelPairs" class="list-group">
+                    <li style="list-style: none">{{ label.notation }}</li>
+                    <li class="list-group-item list-group-item-info" v-for="p in json[label.label].names">{{p.text}}</li>
+
+                </ul>
+            </template>
+
+            <template v-if="category === 'classification'">
+                <label>Classification Choices</label>
+                    <form id="radioForm">
+
+                                            <div class="radio" v-for="label in labelPairs">
+                                                <label>
+                                                    <input type="radio" name="optionsRadios"  :value="label.label" >{{ label.label }}
+                                                </label>
+                                            </div>
+
+                    </form>
+
+
+
+            </template>
+
         </div>
     </div>
     <br />
 
-    <button class="btn btn-lg btn-success" id="go-btn" @click="getRawSentence();">GO</button>
-    <ul class="notation" v-if="notation.visible" :style="{top: notation.y+'px', left:notation.x+'px'}">
-        <li>
-            <button @click="setState('cancel');" class="btn btn-md btn-default">取&nbsp;&nbsp;消</button>
-        </li>
+        <template v-if="category === 'notation'">
+            <button class="btn btn-lg btn-success" id="go-btn" @click="getRawSentence();">GO</button>
+            <ul class="notation" v-if="notation.visible" :style="{top: notation.y+'px', left:notation.x+'px'}">
+                <li>
+                    <button @click="setState('cancel');" class="btn btn-md btn-default">取&nbsp;&nbsp;消</button>
+                </li>
 
-        <li v-for="label in labelPairs">
-            <button  @click="setState(label.label);" class="btn btn-md btn-primary">{{ label.notation}}</button>
-        </li>
+                <li v-for="label in labelPairs">
+                    <button  @click="setState(label.label);" class="btn btn-md btn-primary">{{ label.notation}}</button>
+                </li>
 
-<!--
-        <li>
-            <button @click="setState('protagonist');" class="btn btn-md btn-primary">角&nbsp;&nbsp;色</button>
-        </li>
-        <li>
-            <button @click="setState('location');" class="btn btn-md btn-success">地&nbsp;&nbsp;点</button>
-        </li>
-        <li>
-            <button @click="setState('regulation');" class="btn btn-md btn-danger">法&nbsp;&nbsp;规</button>
-        </li>
--->
-    </ul>
+            </ul>
+        </template>
+
 </div>
 
 

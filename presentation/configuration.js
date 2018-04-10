@@ -4,7 +4,10 @@
 var app = new Vue({
     el: "#app",
     data: {
-        pairs:[
+        notationPairs:[
+
+        ],
+        classificationPairs:[
 
         ],
         databases:[
@@ -57,10 +60,15 @@ var app = new Vue({
                     var jsonObj = $.parseJSON(data);
                     console.log(jsonObj);
                     for (var i=0; i < jsonObj.length; i++) {
-                        self.pairs.push(jsonObj[i]);
+                        if(jsonObj[i]["category"] === 'notation'){
+                            self.notationPairs.push(jsonObj[i]);
+                        }else{
+                            self.classificationPairs.push(jsonObj[i]);
+                        }
+
                     }
 
-                    console.log(self.pairs);
+
                 },
                 error: function (error) {
                     console.log(error);
@@ -68,10 +76,19 @@ var app = new Vue({
             });
         },
         submitLabelChanges:function(){
+            var value =  $("#tabs .active").attr('value');
+
             inputLabels = [];
 
             var self = this;
-            var oTable = document.getElementById('labelTable').getElementsByTagName('tbody')[0];
+
+            var oTable = null;
+            if(value === 'notation'){
+                oTable = document.getElementById('notationTable').getElementsByTagName('tbody')[0];
+            }else{
+                oTable = document.getElementById('classificationTable').getElementsByTagName('tbody')[0];
+            }
+            //var oTable = document.getElementById('labelTable').getElementsByTagName('tbody')[0];
 
 
             var rowLength = oTable.rows.length;
@@ -79,12 +96,14 @@ var app = new Vue({
             for (i = 0; i < rowLength; i++) {
                 var oCells = oTable.rows.item(i).cells;
 
-                singlePair = {'notation':oCells.item(0).innerText.trim(), 'label':oCells.item(1).innerText.trim()};
+                singlePair = {'notation':oCells.item(0).innerText.trim(), 'label':oCells.item(1).innerText.trim(), 'category':value};
                 inputLabels.push(singlePair);
 
             }
             actionData={};
             actionData['labels']=JSON.stringify(inputLabels);
+            actionData['category']=value;
+
             console.log(actionData);
             $.ajax({
                 url: "/configuration/submit-label",
@@ -108,12 +127,13 @@ var app = new Vue({
 
         },
 
-        startNotation: function () {
+        startWork: function (category) {
 
 
             actionData = {};
 
             actionData['database']=$( "#opts" ).val();
+            actionData['category']=category;
             console.log('actionData');
             console.log(actionData);
 
@@ -143,13 +163,30 @@ var app = new Vue({
 
         addOneRow: function () {
             var self = this;
-            self.pairs.push({"notation": "new Notation", "label": "new Label"});
-            console.log(self.pairs);
+            var value =  $("#tabs .active").attr('value');
+            console.log(value);
+            if(value === 'notation'){
+                self.notationPairs.push({"notation": "new Notation", "label": "new Label","category":"notation"});
+                 console.log(self.notationPairs);
+            }else{
+                self.classificationPairs.push({"notation": "new Notation", "label": "new Label","category":"classification"});
+                console.log(self.classificationPairs);
+            }
+
+
+
         },
         deleteLastRow: function () {
             var self = this;
-            self.pairs.splice(-1, 1);
-            console.log(self.pairs);
+            var value =  $("#tabs .active").attr('value');
+            if(value === 'notation') {
+                self.notationPairs.splice(-1, 1);
+                console.log(self.notationPairs)
+            }else{
+                self.classificationPairs.splice(-1, 1);
+                console.log(self.classificationPairs)
+            }
+
 
         }
 

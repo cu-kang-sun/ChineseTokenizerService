@@ -190,7 +190,8 @@ class ConfigurationIO:
         # labels = [{"notation": "人名&机构名", "label": "protagonist"}, {"notation": "地名", "label": "location"},
         #           {"notation": "法规名", "label": "regulation"}]
         # for obj in labels:
-        #     self.label_db.insert_one({'notation': obj['notation'], 'label': obj['label']})
+        #     self.label_db.insert_one({'notation': obj['notation'], 'label': obj['label'], 'category' : 'notation'})
+        #     self.label_db.insert_one({'notation': obj['notation'], 'label': obj['label'], 'category' : 'classification'})
 
         print('configuration initialization done')
 
@@ -223,8 +224,17 @@ class ConfigurationIO:
 
     def getLabels(self):
         cursor = self.label_db.find({})
-        notationToLabel = [{"notation" : doc['notation'], "label" : doc['label'] } for doc in cursor]
+        notationToLabel = [{"notation" : doc['notation'], "label" : doc['label'] ,'category':doc['category']} for doc in cursor]
         return notationToLabel
+
+    def getLabelsByCategory(self,category):
+        cursor = self.label_db.find({'category':category})
+        notationToLabel = [{"notation": doc['notation'], "label": doc['label'],'category':doc['category']} for doc in
+                           cursor]
+        return notationToLabel
+
+
+
 
     def getLabelExport(self):
         cursor = self.label_db.find({},{'_id':0})
@@ -235,9 +245,9 @@ class ConfigurationIO:
 
 
 
-    def insertLabels(self, labelPairs):
+    def insertLabels(self, labelPairs,category):
         print(labelPairs)
-        self.label_db.delete_many({})
+        self.label_db.delete_many({'category':category})
         self.label_db.insert(json.loads(labelPairs))
 
 

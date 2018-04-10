@@ -56,6 +56,7 @@ var controller = new Vue({
 
         start: null,
         end: null,
+        category:null,
 
         notation: {
             x: 0,
@@ -78,57 +79,98 @@ var controller = new Vue({
         initialData: function (){
             var self = this;
             console.log('create vue now');
+
             $.ajax({
-                url: '/configuration/getLabels',
-                method: 'GET',
-                success: function (data) {
-                    console.log(data);
-                    var jsonObj = $.parseJSON(data);
-                    if(jsonObj.length > 14) {
-                        console.log('too many notations, the color used in the notations will be the same if the number of the notations is larger than 14');
-                    }
-
-                    for (var i=0; i < jsonObj.length; i++) {
-                        self.labelPairs.push(jsonObj[i]);
-                        self.labelChecks.push(toOption(jsonObj[i]['label']));
-                        self.emptyJson[jsonObj[i]['label']] = {};
-                        self.emptyJson[jsonObj[i]['label']]['contains'] = 'false';
-                        self.emptyJson[jsonObj[i]['label']]['names'] = [];
-                        self.colorPairs[jsonObj[i]['label']] = colorList[i%colorList.length];
-                    }
-
-                    ////////////////////////////////////////
-                    var sheets = document.styleSheets; // returns an Array-like StyleSheetList
-                    var sheet = document.styleSheets[0];
-
-                    for (let pair of self.labelPairs) {
-                        self.addCSSRule(sheet, '.' + pair['label'], 'background-color:' + self.colorPairs[pair['label']] + '; color: whitesmoke; ', 1);
-                    }
+                url: "/configuration/get-category",
+                type: "get",
+                success: function (res) {
+                    console.log("get category success");
+                    console.log(res);
+                    self.category=res;
 
 
+                                actionData={};
+                                actionData['category']=self.category;
+                                console.log("action data");
+                                console.log(actionData);
+                                $.ajax({
+                                    url: '/configuration/getLabelsByCategory',
+                                    contentType: "application/json",
+                                    dataType: "json",
+                                    data: JSON.stringify(actionData),
+                                    method: 'POST',
+                                    success: function (data) {
+                                        console.log(data);
+                                        //console.log(typeof(data));
+                                        var jsonObj = null;
+                                        if(typeof(jsonObj) === 'object'){
+                                            jsonObj=data;
+                                        }else{
+                                            jsonObj = $.parseJSON(data);
+                                        }
 
-                    self.ciClass +=  "{peek:ci.isPeeked";
-                    for (let pair of self.labelPairs) {
-                        self.ciClass += "," + pair['label'] + ": " + "ci." + toOption(pair['label']);
-                    }
-                    self.ciClass += "}";
+
+                                        //var jsonObj = $.parseJSON(data);
+
+                                        if(jsonObj.length > 14) {
+                                            console.log('too many labels, the color used in the labels will be the same if the number of the notations is larger than 14');
+                                            alert("too many labels, the color used in the labels will be the same if the number of the notations is larger than max ")
+                                        }
+
+                                        for (var i=0; i < jsonObj.length; i++) {
+                                            self.labelPairs.push(jsonObj[i]);
+                                            self.labelChecks.push(toOption(jsonObj[i]['label']));
+                                            self.emptyJson[jsonObj[i]['label']] = {};
+                                            self.emptyJson[jsonObj[i]['label']]['contains'] = 'false';
+                                            self.emptyJson[jsonObj[i]['label']]['names'] = [];
+                                            self.colorPairs[jsonObj[i]['label']] = colorList[i%colorList.length];
+                                        }
+
+                                        ////////////////////////////////////////
+                                        var sheets = document.styleSheets; // returns an Array-like StyleSheetList
+                                        var sheet = document.styleSheets[0];
+
+                                        for (let pair of self.labelPairs) {
+                                            self.addCSSRule(sheet, '.' + pair['label'], 'background-color:' + self.colorPairs[pair['label']] + '; color: whitesmoke; ', 1);
+                                        }
 
 
-                    /////////////////////////////////////
 
-                    console.log('ciclass');
-                    console.log(self.ciClass);
-                    console.log(self.labelPairs);
-                    console.log(self.emptyJson);
-                    console.log(JSON.stringify(self.emptyJson));
-                    console.log(self.labelChecks);
-                    console.log(self.colorPairs);
-                    self.json = copyJson(self.emptyJson);
-                },
-                error: function (error) {
+                                        self.ciClass +=  "{peek:ci.isPeeked";
+                                        for (let pair of self.labelPairs) {
+                                            self.ciClass += "," + pair['label'] + ": " + "ci." + toOption(pair['label']);
+                                        }
+                                        self.ciClass += "}";
+
+
+                                        /////////////////////////////////////
+
+                                        console.log('ciclass');
+                                        console.log(self.ciClass);
+                                        console.log(self.labelPairs);
+                                        console.log(self.emptyJson);
+                                        console.log(JSON.stringify(self.emptyJson));
+                                        console.log(self.labelChecks);
+                                        console.log(self.colorPairs);
+                                        self.json = copyJson(self.emptyJson);
+                                    },
+                                    error: function (error) {
+                                        console.log(error);
+                                        alert("get labels err!");
+                                    }
+                                });
+
+
+
+
+
+                },error: function (error) {
                     console.log(error);
+                    alert("get category err!")
                 }
             });
+
+
 
             console.log('finish data initialization');
         },
@@ -273,11 +315,28 @@ var controller = new Vue({
         submit: function () {
             // this.action = "提交中";
             var self = this;
+            var actionData = null;
+            if(self.category === 'notation'){
+                console.log("now submit a notation work!");
+                actionData=self.json;
+                actionData['category'] = 'notation';
+            }else{
+                console.log("now submit a classification work!");
+                actionData={};
+                actionData['_id']=self.json['_id'];
+                actionData['text']=self.json['text'];
+                //actionData['database']=self.json['database'];
+                actionData['category']='classification';
+                var choice=document.getElementById("radioForm").querySelector('input[name="optionsRadios"]:checked').value;
+                console.log("radio choice:"+ choice);
+                actionData['genre']=choice;
+            }
+
             $.ajax({
                 url: "/notation/submit-notation",
                 contentType: "application/json",
                 dataType: "json",
-                data: JSON.stringify(self.json),
+                data: JSON.stringify(actionData),
                 type: "POST",
                 success: function (res) {
                     self.getRawSentence()
@@ -287,12 +346,11 @@ var controller = new Vue({
                     console.log(err);
 
                 }
-            })
+            });
         },
 
         exportNotation: function(){
             var self = this;
-
 
             $.ajax({
                 url: "/notation/export-notation",
@@ -313,7 +371,7 @@ var controller = new Vue({
                 error: function (err) {
                     console.log(err);
                 }
-            })
+            });
         },
 
         download:function (text, name, type) {
