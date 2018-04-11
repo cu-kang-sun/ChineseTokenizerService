@@ -196,7 +196,7 @@ class ConfigurationIO:
         print('configuration initialization done')
 
 
-    def insertTextIntoDatabase(self, sentences,database):
+    def insertTextIntoDatabase(self, sentences,database,type):
         if(self.config_db.find().count() == 0 and self.train_db.find().count() == 0):
             max_id = 0
 
@@ -212,7 +212,7 @@ class ConfigurationIO:
 
 
 
-        sentence_state = [{"_id": index+1+max_id, "text": s, "database":database} for index, s in enumerate(sentences)]
+        sentence_state = [{"_id": index+1+max_id, "text": s, "database":database, "category":type} for index, s in enumerate(sentences)]
         saveJsonObj = json.dumps(sentence_state,ensure_ascii=False)
         print(saveJsonObj)
         #self.config_db.delete_many({})

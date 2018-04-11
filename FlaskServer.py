@@ -89,6 +89,49 @@ def upload_file():
 
     #return "ok, upload file to database success"
 
+
+#根据用户选择的txt文本文件，传入数据库
+@app.route('/configuration/upload', methods=['POST'])
+def database_file_upload():
+    response = {}
+    name = request.form['name']
+    print('new database name:' + name)
+    if(len(name) == 0):
+        response['status']='fail'
+        response['msg']= "请对您要上传的数据库进行命名，否则您将无法上传"
+        return json.dumps(response,ensure_ascii=False)
+
+    type = request.form['type']
+    print('new database type' + type)
+
+
+    trainedDatabase = configIO.getTrainedDatabases()
+    untrainedDatabase = configIO.getUntrainedDatabases()
+    print("now here the databases:")
+    print(trainedDatabase)
+    print(untrainedDatabase)
+    if(name in untrainedDatabase or name in trainedDatabase):
+        response['status'] = 'fail'
+        response['msg'] = "在数据库中已经有一个名为'"+ name +"'的数据库, 请重命名您的数据库"
+        return json.dumps(response,ensure_ascii=False)
+
+
+
+
+    print("begin upload file to database")
+    f = request.files['file']
+    lines = f.stream.read().decode('utf-8').split('。')
+    lines = lines[:-1]
+
+
+
+    configIO.insertTextIntoDatabase(lines,name,type)
+    response['status'] = 'success'
+    response['msg'] = "上传文件成功，成功存入数据库！"
+    return json.dumps(response,ensure_ascii=False)
+
+
+
 #查所有还没有被训练的数据库名称
 @app.route('/configuration/getDatabases', methods=['GET'])
 def choose_database():

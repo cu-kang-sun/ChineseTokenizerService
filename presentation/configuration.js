@@ -1,6 +1,7 @@
 
 
 
+
 var app = new Vue({
     el: "#app",
     data: {
@@ -38,12 +39,7 @@ var app = new Vue({
 
         },
 
-        uploadFile: function(){
-            var self = this;
-            var file = document.getElementById('databaseName');
-            console.log(file);
 
-        },
         abandonLabelChanges: function() {
             location.reload();
         }
@@ -74,6 +70,53 @@ var app = new Vue({
                     console.log(error);
                 }
             });
+        },
+
+        uploadFile: function(){
+
+                  if(document.getElementById('database-file').value.trim() === ""){
+                      alert("请选择需要上传的文件！");
+                  }else{
+
+                      let data = new FormData();
+                      data.append('file', document.getElementById('database-file').files[0]);
+                      data.append('type',$( "#database-type" ).val());
+                      data.append('name',document.getElementById('databaseName').value);
+
+
+
+                                  $.ajax({
+                                    url: "/configuration/upload",
+                                      contentType: false,
+                                    processData: false,
+                                    data: data,
+                                    type: "POST",
+                                    success: function (res) {
+
+                                        console.log(res);
+                                        var response = JSON.parse(res);
+
+
+                                        if(response['status'] === 'fail'){
+                                            console.log("upload file fail");
+                                            alert(response['msg']);
+                                        }else{
+                                            console.log("upload file success");
+                                            alert(response['msg']);
+                                        }
+
+
+                                    },
+                                    error: function (err) {
+
+                                        console.log(err);
+
+                                    }
+                                })
+
+
+                }
+
         },
         submitLabelChanges:function(){
             var value =  $("#tabs .active").attr('value');

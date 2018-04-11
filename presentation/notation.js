@@ -39,8 +39,6 @@ function toLabel(str)
 }
 
 
-
-
 var controller = new Vue({
     el: "#controller",
     data: {
