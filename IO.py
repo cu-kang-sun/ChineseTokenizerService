@@ -241,8 +241,22 @@ class ConfigurationIO:
         data = [doc for doc in cursor]
         return data
 
+    def findLabel(self,label,category):
+        cursor = self.label_db.find({'label':label,'category':category})
+        return cursor.count()
+
+    def findMark(self,mark,category):
+        cursor = self.label_db.find({'notation':mark,'category':category})
+        return cursor.count()
 
 
+
+
+
+
+    def insertOneLabel(self,labelPair):
+        print(labelPair)
+        self.label_db.insert(labelPair)
 
 
     def insertLabels(self, labelPairs,category):
@@ -260,11 +274,22 @@ class ConfigurationIO:
         return list
 
     def getUntrainedDatabases(self):
-        cursor = self.config_db.find({'_id':{'$gt': 0}} , {'database':1 })
+        cursor = self.config_db.find({'_id':{'$gt': 0}} , {'database':1})
         list = []
         for item in cursor:
             if item['database'] not in list:
                 list.append(item['database'])
+        return list
+
+
+    def getUntrainedDatabasesGroupByCategory(self):
+        cursor = self.config_db.find({'_id': {'$gt': 0}}, {'database': 1,'category':1 })
+        # list = [{"name": doc['database'], "category": doc['category']} for doc in cursor]
+        list=[]
+        for item in cursor:
+            doc={"name": item['database'], "category": item['category']}
+            if doc not in list:
+                list.append(doc)
         return list
 
     def getSubmittedSentencesFromDatabase(self, database):

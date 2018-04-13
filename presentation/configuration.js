@@ -13,7 +13,8 @@ var app = new Vue({
         ],
         databases:[
 
-        ]
+        ],
+        type:null
     },
 
     methods: {
@@ -103,6 +104,8 @@ var app = new Vue({
                                         }else{
                                             console.log("upload file success");
                                             alert(response['msg']);
+                                            // self.getDatabases();
+                                            window.location.reload();
                                         }
 
 
@@ -118,44 +121,114 @@ var app = new Vue({
                 }
 
         },
-        submitLabelChanges:function(){
-            var value =  $("#tabs .active").attr('value');
+        decideType: function(){
+          var self = this;
+          var value =  $("#tabs .active").attr('value');
+          if(value === 'notation'){
+                self.type="标注";
+            }else{
+                self.type="类别";
+            }
 
-            inputLabels = [];
+        },
+
+        deleteAllUnusedRows: function(){
+            var value =  $("#tabs .active").attr('value');
+            inputLabels = {};
 
             var self = this;
 
-            var oTable = null;
-            if(value === 'notation'){
-                oTable = document.getElementById('notationTable').getElementsByTagName('tbody')[0];
-            }else{
-                oTable = document.getElementById('classificationTable').getElementsByTagName('tbody')[0];
-            }
-            //var oTable = document.getElementById('labelTable').getElementsByTagName('tbody')[0];
 
 
-            var rowLength = oTable.rows.length;
-
-            for (i = 0; i < rowLength; i++) {
-                var oCells = oTable.rows.item(i).cells;
-
-                singlePair = {'notation':oCells.item(0).innerText.trim(), 'label':oCells.item(1).innerText.trim(), 'category':value};
-                inputLabels.push(singlePair);
-
-            }
             actionData={};
-            actionData['labels']=JSON.stringify(inputLabels);
-            actionData['category']=value;
 
-            console.log(actionData);
+            actionData['category']=value;
             $.ajax({
-                url: "/configuration/submit-label",
+                url: "/configuration/delete-unused-labels",
                 contentType: "application/json",
                 dataType: "json",
                 data: JSON.stringify(actionData),
                 type: "POST",
                 success: function (res) {
-                     alert("您的标签已经被更新");
+                    console.log(res);
+
+
+                },
+                error: function (err) {
+                    alert("您的标签删除出现错误");
+                    console.log(err);
+
+                }
+            });
+
+
+        },
+        submitLabelChanges:function(){
+            if(document.getElementById('new_mark').value.trim() === '' || document.getElementById('new_tag').value.trim()
+                    === ''){
+                alert("请确保您填写的值不为空！");
+                return;
+            }
+
+            var value =  $("#tabs .active").attr('value');
+
+            inputLabels = {};
+
+            var self = this;
+
+            // var oTable = null;
+            // if(value === 'notation'){
+            //     oTable = document.getElementById('notationTable').getElementsByTagName('tbody')[0];
+            // }else{
+            //     oTable = document.getElementById('classificationTable').getElementsByTagName('tbody')[0];
+            // }
+            // //var oTable = document.getElementById('labelTable').getElementsByTagName('tbody')[0];
+            //
+            //
+            // var rowLength = oTable.rows.length;
+            //
+            // for (i = 0; i < rowLength; i++) {
+            //     var oCells = oTable.rows.item(i).cells;
+            //
+            //     singlePair = {'notation':oCells.item(0).innerText.trim(), 'label':oCells.item(1).innerText.trim(), 'category':value};
+            //     inputLabels.push(singlePair);
+            //
+            // }
+
+            inputLabels['category']=value;
+            inputLabels['notation']=document.getElementById('new_mark').value;
+            inputLabels['label']=document.getElementById('new_tag').value;
+
+
+
+            actionData={};
+            actionData['newPair']=JSON.stringify(inputLabels);
+            // actionData['category']=value;
+
+            console.log(actionData);
+            $.ajax({
+                url: "/configuration/submit-labeladded",
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify(actionData),
+                type: "POST",
+                success: function (res) {
+                    console.log(res);
+
+                    var response = null;
+                    if(typeof(response) === 'object') {
+
+                        response=res;
+                    }else{
+                        response=JSON.parse(res);
+                    }
+                    if(response['status'] === 'success') {
+                        alert("您的标签已经被更新");
+                        $('#myModal').modal('hide');
+                        window.location.reload();
+                    }else{
+                        alert(response['msg']);
+                    }
 
                 },
                 error: function (err) {
@@ -170,31 +243,53 @@ var app = new Vue({
 
         },
 
+
         startWork: function (category) {
+            if(document.getElementById(category+'opts').value.trim() === ""){
+                alert("目前数据库中没有文本，请上传数据库");
+                return;
+            }
+
+            var oTable = null;
+            if(category === 'notation'){
+                oTable = document.getElementById('notationTable').getElementsByTagName('tbody')[0];
+            }else{
+                oTable = document.getElementById('classificationTable').getElementsByTagName('tbody')[0];
+            }
+            //var oTable = document.getElementById('labelTable').getElementsByTagName('tbody')[0];
 
 
-            actionData = {};
+            var rowLength = oTable.rows.length;
+            if(rowLength == 0){
+                alert("您尚未设置任何用于使用的标签，请添加标签后再进行工作");
+                return;
+            }
+            // alert(rowLength);
 
-            actionData['database']=$( "#opts" ).val();
-            actionData['category']=category;
-            console.log('actionData');
-            console.log(actionData);
 
-            $.ajax({
-                url: "/configuration/start-notation",
-                contentType: "application/json",
-                dataType: "json",
-                data: JSON.stringify(actionData),
-                type: "POST",
-                success: function (res) {
-                     window.location.replace("notation.html");
+                actionData = {};
+                var name = category + 'opts';
+                actionData['database']=$( "#"+name ).val();
+                // alert( actionData['database']);
+                actionData['category']=category;
+                console.log('actionData');
+                console.log(actionData);
 
-                },
-                error: function (err) {
-                    console.log(err);
+                $.ajax({
+                    url: "/configuration/start-notation",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify(actionData),
+                    type: "POST",
+                    success: function (res) {
+                         window.location.replace("notation.html");
 
-                }
-            })
+                    },
+                    error: function (err) {
+                        console.log(err);
+
+                    }
+                })
 
 
 

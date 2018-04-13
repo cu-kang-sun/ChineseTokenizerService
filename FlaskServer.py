@@ -135,7 +135,7 @@ def database_file_upload():
 #查所有还没有被训练的数据库名称
 @app.route('/configuration/getDatabases', methods=['GET'])
 def choose_database():
-    database = configIO.getUntrainedDatabases()
+    database = configIO.getUntrainedDatabasesGroupByCategory()
 
     return json.dumps(database)
 
@@ -163,22 +163,55 @@ def fetch_label_byCategory():
 
 
 
-@app.route('/configuration/submit-label', methods=['POST'])
-def submit_labels():
+# @app.route('/configuration/submit-label', methods=['POST'])
+# def submit_labels():
+#
+#     inputData = request.get_json()
+#     pairs = inputData.get("labels")
+#     category = inputData.get("category")
+#
+#
+#     try:
+#         configIO.insertLabels(pairs,category)
+#     except:
+#         return "500"
+#     else:
+#         return "200"
 
+@app.route('/configuration/delete-unused-labels', methods=['POST'])
+def delete_unused_lables():
     inputData = request.get_json()
-    pairs = inputData.get("labels")
+
     category = inputData.get("category")
 
 
-    try:
-        configIO.insertLabels(pairs,category)
-    except:
-        return "500"
-    else:
-        return "200"
 
 
+@app.route('/configuration/submit-labeladded', methods=['POST'])
+def submit_labels_added():
+    inputData = request.get_json()
+    pairStr = inputData.get("newPair")
+    pair = json.loads(pairStr)
+    response={}
+    if(configIO.findLabel(pair['label'],pair['category']) != 0):
+        response['status']='fail'
+        response['msg']='已经存在一个名为'+pair['label']+'的标签， 请对您的标签进行重命名'
+        return json.dumps(response, ensure_ascii=False)
+    if (configIO.findMark(pair['notation'],pair['category']) != 0):
+        name=''
+        if(pair['category'] == 'notation'):
+            name='标注'
+        else:
+            name='分类'
+        response['status']='fail'
+        response['msg']='已经存在一个名为'+pair['notation']+'的'+ name +'， 请对您的标签进行重命名'
+        return json.dumps(response, ensure_ascii=False)
+
+
+    configIO.insertOneLabel(pair)
+    response['status'] = 'success'
+    response['msg'] = '上传成功'
+    return json.dumps(response, ensure_ascii=False)
 
 
 

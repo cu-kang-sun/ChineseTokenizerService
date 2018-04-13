@@ -263,8 +263,8 @@ var controller = new Vue({
                 error: function (err) {
                     alert("已经获取完本数据库中的句子，请返回配置页面重新选择数据库进行处理");
                     console.log("get raw sentence fail");
-
                     console.log(err);
+                    // window.location.replace("notation.html");
                 }
             });
         },
@@ -337,7 +337,7 @@ var controller = new Vue({
                 data: JSON.stringify(actionData),
                 type: "POST",
                 success: function (res) {
-                    self.getRawSentence()
+                    self.getRawSentence();
 
                 },
                 error: function (err) {

@@ -41,26 +41,19 @@
 
 <!--action="upload"  method=post  -->
           <form >
-
                     <input id="database-file" type=file name=file/>
                     </br>
                     <span>请输入您要创建的数据库名字</span>
                     <input id="databaseName" class="form-control" name="databaseName"/>
                     </br>
-
                                             <span>请选择数据库类型</span>
                                             <select class="form-control" id="database-type">
-                                                <option value="notation"> 标记</option>
+                                                <option value="notation"> 标注</option>
                                                 <option value="classification">分类</option>
 
                                             </select>
-
                 </br>
-
               <button type="button" class="btn btn-default" v-on:click="uploadFile();">上传</button>
-
-
-
             </form>
 
 
@@ -130,8 +123,8 @@
 
                                                     <tr v-for="pair in notationPairs" >
                                                         <template v-if="pair.category === 'notation'">
-                                                        <td> <div class =" notationInTable" contenteditable> {{pair.notation}} </div> </td>
-                                                        <td> <div class =" labelInTable" contenteditable> {{pair.label}}    </div> </td>
+                                                        <td> <div class =" notationInTable" > {{pair.notation}} </div> </td>
+                                                        <td> <div class =" labelInTable"> {{pair.label}}    </div> </td>
                                                             </template>
                                                     </tr>
                                                     </tbody>
@@ -139,10 +132,11 @@
                                                 </table>
 
                                                       <div class="row" style="margin: 0 auto;text-align: center;">
-                                                                  <button class="btn btn-default btn-primary" v-on:click="addOneRow();">增加一行</button>
-                                                                    <button class="btn btn-default btn-warning" v-on:click="deleteLastRow();">删除最后行</button>
+                                                          <button type="button" class="btn btn-default btn-primary" data-toggle="modal" data-target="#myModal" v-on:click="decideType();">增加一行</button>
+                                              <!--            <button class="btn btn-default btn-danger" v-on:click="deleteAllUnusedRows();">删除所有未使用过的标签</button>
+                                                                                    <button class="btn btn-default btn-warning" v-on:click="deleteLastRow();">删除最后行</button>
                                                           <button class="btn btn-default btn-danger" v-on:click="abandonLabelChanges();">放弃编辑</button>
-                                                          <button class="btn btn-default btn-success" v-on:click="submitLabelChanges();">提交编辑</button>
+                                                          <button class="btn btn-default btn-success" v-on:click="submitLabelChanges();">提交编辑</button>       -->
                                                       </div>
                                                   </div>
                                     </div>
@@ -161,8 +155,8 @@
                                                       <div class="panel-body">
                                                         <div class="form-group">
                                                             <span>选择您要操作的文本库</span>
-                                                            <select class="form-control" id="opts">
-                                                                <option v-for="database in databases"  >{{ database }}</option>
+                                                            <select class="form-control" id="notationopts">
+                                                                <option v-for="database in databases" v-if="database.category==='notation'" >{{ database.name }}</option>
                                                             </select>
 
                                                         </div>
@@ -214,8 +208,8 @@
 
                                                         <tr v-for="pair in classificationPairs" >
                                                         <template v-if="pair.category === 'classification'">
-                                                        <td> <div class =" notationInTable" contenteditable> {{pair.notation}} </div> </td>
-                                                        <td> <div class =" labelInTable" contenteditable> {{pair.label}}    </div> </td>
+                                                        <td> <div class =" notationInTable" > {{pair.notation}} </div> </td>
+                                                        <td> <div class =" labelInTable" > {{pair.label}}    </div> </td>
                                                             </template>
                                                     </tr>
                                                         </tbody>
@@ -223,13 +217,28 @@
                                                     </table>
 
                                                           <div class="row" style="margin: 0 auto;text-align: center;">
-                                                                      <button class="btn btn-default btn-primary" v-on:click="addOneRow();">增加一行</button>
-                                                                        <button class="btn btn-default btn-warning" v-on:click="deleteLastRow();">删除最后行</button>
+                                                              <button type="button" class="btn btn-default btn-primary" data-toggle="modal" data-target="#myModal" v-on:click="decideType();">增加一行 </button>
+                                             <!--                 <button class="btn btn-default btn-warning" v-on:click="deleteLastRow();">删除最后行</button>
                                                               <button class="btn btn-default btn-danger" v-on:click="abandonLabelChanges();">放弃编辑</button>
-                                                              <button class="btn btn-default btn-success" v-on:click="submitLabelChanges();">提交编辑</button>
+                                                              <button class="btn btn-default btn-success" v-on:click="submitLabelChanges();">提交编辑</button>  -->
                                                           </div>
                                                       </div>
+
+
+
+
+
+
+
                                       </div>
+
+
+
+
+
+
+
+
                                         </div>
 
 
@@ -244,23 +253,20 @@
                                               <div class="panel-body">
                                                 <div class="form-group">
                                                     <span>选择您要操作的文本库</span>
-                                                    <select class="form-control" id="opts">
-                                                        <option v-for="database in databases" >{{ database }}</option>
+                                                    <select class="form-control" id="classificationopts">
+                                                        <option v-for="database in databases" v-if="database.category==='classification'">{{ database.name }}</option>
                                                     </select>
 
                                                 </div>
 
-                                                  <button class="btn btn-default btn-success" v-on:click="startWork('classification');"        >开始分类</button>
+                                                  <button class="btn btn-default btn-warning" v-on:click="startWork('classification');"        >开始分类</button>
                                               </div>
 
                                                     </div>
 
                                                   </div>
-
                                   </div>
                                 </div>
-
-
                                   </div>
 
 
@@ -268,6 +274,8 @@
 
 
                             </div>
+
+
 
 
 
@@ -293,9 +301,55 @@
 
         </div>
     </div>
+
+
+
+
+
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title" id="myModalLabel">
+					标签添加栏
+				</h4>
+			</div>
+			<div class="modal-body">
+					<form class="bs-example bs-example-form" role="form">
+                        <div class="input-group">
+                            <span class="input-group-addon">{{ type }}：</span>
+                            <input type="text" class="form-control" id="new_mark">
+                        </div><br>
+                        <div class="input-group">
+                            <span class="input-group-addon">标签：</span>
+                            <input type="text" class="form-control" id="new_tag">
+                        </div>
+                    </form>
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-warning" data-dismiss="modal">放弃编辑
+				</button>
+				<button type="button" class="btn btn-success" v-on:click="submitLabelChanges();">
+					提交编辑
+				</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+
+
+
+
 </div>
     <script src="/configuration.js"></script>
-    <script src="/bootstrap.js"></script>
+
 <script src="/bootstrap.min.js"></script>
 
 </body>
