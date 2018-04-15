@@ -3,6 +3,7 @@ from pymongo import MongoClient
 import random
 import json
 from utl import count as time_counter
+from time import gmtime, strftime
 
 
 class NotationIO:
@@ -186,6 +187,9 @@ class ConfigurationIO:
         self.label_db = MongoClient('localhost', 27017).get_database("tokenizer_qiao").get_collection(
             'Labels')
 
+        self.task_db = MongoClient('localhost', 27017).get_database("tokenizer_qiao").get_collection(
+            'Tasks')
+
         # self.label_db.delete_many({})
         # labels = [{"notation": "人名&机构名", "label": "protagonist"}, {"notation": "地名", "label": "location"},
         #           {"notation": "法规名", "label": "regulation"}]
@@ -218,7 +222,13 @@ class ConfigurationIO:
         #self.config_db.delete_many({})
         self.config_db.insert(json.loads(saveJsonObj))
 
-
+    def insertTask(self,databaseName, type, description):
+        task = {}
+        task['database']=databaseName
+        task['type']=type
+        task['description']=description
+        task['timeAdded']=strftime("%Y-%m-%d %H:%M:%S", gmtime())
+        self.task_db.insert(task)
 
 
 

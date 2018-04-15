@@ -75,14 +75,26 @@ var app = new Vue({
 
         uploadFile: function(){
 
-                  if(document.getElementById('database-file').value.trim() === ""){
+                  if(document.getElementById('database-file').value.trim() === "") {
                       alert("请选择需要上传的文件！");
-                  }else{
+                      return;
+                  }
+                  if(document.getElementById('description').value.trim() === "") {
+                      alert("请输入关于任务的描述并且描述不能为空!");
+                      return;
+                  }
+                  if(document.getElementById('databaseName').value.trim() === "") {
+                      alert("请对您要上传的数据库进行命名，否则您将无法上传!");
+                      return;
+                  }
+
+
 
                       let data = new FormData();
                       data.append('file', document.getElementById('database-file').files[0]);
                       data.append('type',$( "#database-type" ).val());
                       data.append('name',document.getElementById('databaseName').value);
+                      data.append('description',document.getElementById('description').value);
 
 
 
@@ -118,7 +130,7 @@ var app = new Vue({
                                 })
 
 
-                }
+                // }
 
         },
         decideType: function(){

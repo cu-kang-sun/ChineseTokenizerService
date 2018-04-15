@@ -95,11 +95,12 @@ def upload_file():
 def database_file_upload():
     response = {}
     name = request.form['name']
+    description = request.form['description']
     print('new database name:' + name)
-    if(len(name) == 0):
-        response['status']='fail'
-        response['msg']= "请对您要上传的数据库进行命名，否则您将无法上传"
-        return json.dumps(response,ensure_ascii=False)
+    # if(len(name) == 0):
+    #     response['status']='fail'
+    #     response['msg']= "请对您要上传的数据库进行命名，否则您将无法上传"
+    #     return json.dumps(response,ensure_ascii=False)
 
     type = request.form['type']
     print('new database type' + type)
@@ -128,6 +129,8 @@ def database_file_upload():
     configIO.insertTextIntoDatabase(lines,name,type)
     response['status'] = 'success'
     response['msg'] = "上传文件成功，成功存入数据库！"
+
+    configIO.insertTask(name,type,description)
     return json.dumps(response,ensure_ascii=False)
 
 
