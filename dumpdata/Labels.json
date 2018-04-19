@@ -1,0 +1,42 @@
+{
+	"_id" : ObjectId("5acc17b546aae1107651475f"),
+	"category" : "classification",
+	"label" : "location",
+	"notation" : "地名"
+},
+{
+	"_id" : ObjectId("5acc17b546aae11076514760"),
+	"category" : "classification",
+	"label" : "regulation",
+	"notation" : "法规名"
+},
+{
+	"_id" : ObjectId("5acc17b546aae11076514761"),
+	"category" : "classification",
+	"label" : "time",
+	"notation" : "时间名"
+},
+{
+	"_id" : ObjectId("5acc17b546aae11076514762"),
+	"category" : "classification",
+	"label" : "format",
+	"notation" : "格式名"
+},
+{
+	"_id" : ObjectId("5acf16bf46aae11e26acbdfa"),
+	"category" : "notation",
+	"label" : "people",
+	"notation" : "人名"
+},
+{
+	"_id" : ObjectId("5acf16bf46aae11e26acbdfb"),
+	"category" : "notation",
+	"label" : "location",
+	"notation" : "地名"
+},
+{
+	"_id" : ObjectId("5ad05dc646aae120e43dc5d6"),
+	"category" : "notation",
+	"label" : "project",
+	"notation" : "项目"
+},

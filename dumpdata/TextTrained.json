@@ -1,0 +1,89 @@
+{
+	"_id" : NumberInt("1"),
+	"category" : "notation",
+	"database" : "何欢案卷1",
+	"location" : {
+		"contains" : true,
+		"names" : [
+			{
+				"start" : NumberInt("55"),
+				"text" : "源大公司",
+				"end" : NumberInt("58")
+			}
+		]
+	},
+	"people" : {
+		"contains" : true,
+		"names" : [
+			{
+				"start" : NumberInt("5"),
+				"text" : "程某、郭某1、严某",
+				"end" : NumberInt("13")
+			},
+			{
+				"start" : NumberInt("42"),
+				"text" : "赵某1、李某3、么某",
+				"end" : NumberInt("51")
+			},
+			{
+				"start" : NumberInt("67"),
+				"text" : "苏某",
+				"end" : NumberInt("68")
+			},
+			{
+				"start" : NumberInt("74"),
+				"text" : "民警",
+				"end" : NumberInt("75")
+			}
+		]
+	},
+	"project" : {
+		"contains" : "false",
+		"names" : [ ]
+	},
+	"text" : "1.被害人程某、郭某1、严某（均系讨债人员）陈述：2016年4月14日下午，其三人与赵某1、李某3、么某等人到源大公司要账，先是报警称苏某私刻公章，民警来说不能打架，然后就走了"
+},
+{
+	"_id" : NumberInt("2"),
+	"category" : "notation",
+	"database" : "何欢案卷1",
+	"location" : {
+		"contains" : true,
+		"names" : [
+			{
+				"start" : NumberInt("7"),
+				"text" : "办公楼大厅",
+				"end" : NumberInt("11")
+			}
+		]
+	},
+	"people" : {
+		"contains" : true,
+		"names" : [
+			{
+				"start" : NumberInt("19"),
+				"text" : "杜某2、杜某7",
+				"end" : NumberInt("25")
+			}
+		]
+	},
+	"project" : {
+		"contains" : "false",
+		"names" : [ ]
+	},
+	"text" : "傍晚，他们守在办公楼大厅外烤串喝酒时，杜某2、杜某7来了"
+},
+{
+	"_id" : NumberInt("6"),
+	"category" : "classification",
+	"database" : "何欢案卷2",
+	"genre" : "location",
+	"text" : "傍晚，他们守在办公楼大厅外烤串喝酒时，杜某2、杜某7来了"
+},
+{
+	"_id" : NumberInt("7"),
+	"category" : "classification",
+	"database" : "何欢案卷2",
+	"genre" : "format",
+	"text" : "程某、杜某7、李某3、杜某2喝了两瓶白酒，其他人喝了两箱啤酒"
+},
