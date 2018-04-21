@@ -358,6 +358,6 @@ def tokenize():
 
 
 if __name__ == '__main__':
-    app.run(host="localhost", port=8000)
+    app.run(host="localhost", port=8888)
     #app.run(host="192.168.68.11", port=8000)
 # end
