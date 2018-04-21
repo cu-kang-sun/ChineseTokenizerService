@@ -47,12 +47,12 @@
             </template>
 
             <template v-if="category === 'classification'">
-                <label>Classification Choices</label>
+                <label>分类选项</label>
                     <form id="radioForm">
 
                                             <div class="radio" v-for="label in labelPairs">
                                                 <label>
-                                                    <input type="radio" name="optionsRadios"  :value="label.label" >{{ label.label }}
+                                                    <input type="radio" name="optionsRadios"  :value="label.label" >{{ label.notation }}
                                                 </label>
                                             </div>
 
