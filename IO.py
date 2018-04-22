@@ -8,14 +8,14 @@ from time import gmtime, strftime
 
 class NotationIO:
     def __init__(self):
-        # self.test_db = MongoClient('localhost', 20000).get_database("tokenizer_qiao").get_collection('sentences_sample')
-        self.test_db = MongoClient('localhost', 20000).get_database("tokenizer_qiao").get_collection(
+        # self.test_db = MongoClient('localhost', 27017).get_database("tokenizer_qiao").get_collection('sentences_sample')
+        self.test_db = MongoClient('localhost', 27017).get_database("tokenizer_qiao").get_collection(
             #'sentence4test')
         'TextLibrary')
 
         self.test_size = self.test_db.find().count()
         self.test_cursor = self.test_db.find()
-        self.train_db = MongoClient('localhost', 20000).get_database("tokenizer_qiao").get_collection(
+        self.train_db = MongoClient('localhost', 27017).get_database("tokenizer_qiao").get_collection(
             'TextTrained')
 
     def get_raw_randomly(self):
@@ -60,7 +60,7 @@ class RemoteIO:
     def __init__(self):
         time_counter(print_to_console=False)
         print("初始化 RemoteIO")
-        self.db = MongoClient('localhost', 20000).get_database("tokenizer_qiao").get_collection('splited_sentences')
+        self.db = MongoClient('localhost', 27017).get_database("tokenizer_qiao").get_collection('splited_sentences')
         self.sentence_size = self.db.find().count()
         self.step = self.sentence_size
         self.skip = 0
@@ -103,7 +103,7 @@ class CorpusIO:
 
     # 从数据库构造语料库
     def read_from_mongo(self, limit=20):
-        db = self.db if self.db is not None else MongoClient('localhost', 20000).get_database(
+        db = self.db if self.db is not None else MongoClient('localhost', 27017).get_database(
             'tokenizer_qiao').get_collection('edges')
         cursor = db.find({})
         cnt = 0
@@ -129,7 +129,7 @@ class CorpusIO:
 
 class TextIO:
     def __init__(self):
-        self.db = MongoClient('localhost', 20000).get_database('chinese').get_collection('train')
+        self.db = MongoClient('localhost', 27017).get_database('chinese').get_collection('train')
 
     def get_mongo_size(self):
         size = self.db.count()
@@ -148,7 +148,7 @@ class TextIO:
 
 class DisIO:
     def __init__(self):
-        self.db = MongoClient('localhost', 20000).get_database('orig').get_collection('sentences')
+        self.db = MongoClient('localhost', 27017).get_database('orig').get_collection('sentences')
 
     def sen_from_mongo(self):
         cursor = self.db.find({})
@@ -178,16 +178,16 @@ class DisIO:
 
 class ConfigurationIO:
     def __init__(self):
-        self.config_db = MongoClient('localhost', 20000).get_database("tokenizer_qiao").get_collection(
+        self.config_db = MongoClient('localhost', 27017).get_database("tokenizer_qiao").get_collection(
             'TextLibrary')
 
-        self.train_db = MongoClient('localhost', 20000).get_database("tokenizer_qiao").get_collection(
+        self.train_db = MongoClient('localhost', 27017).get_database("tokenizer_qiao").get_collection(
             'TextTrained')
 
-        self.label_db = MongoClient('localhost', 20000).get_database("tokenizer_qiao").get_collection(
+        self.label_db = MongoClient('localhost', 27017).get_database("tokenizer_qiao").get_collection(
             'Labels')
 
-        self.task_db = MongoClient('localhost', 20000).get_database("tokenizer_qiao").get_collection(
+        self.task_db = MongoClient('localhost', 27017).get_database("tokenizer_qiao").get_collection(
             'Tasks')
 
         # self.label_db.delete_many({})
@@ -225,7 +225,7 @@ class ConfigurationIO:
     def insertTask(self,databaseName, type, description):
         task = {}
         task['database']=databaseName
-        task['type']=type
+        task['category']=type
         task['description']=description
         task['timeAdded']=strftime("%Y-%m-%d %H:%M:%S", gmtime())
         self.task_db.insert(task)
@@ -246,8 +246,8 @@ class ConfigurationIO:
 
 
 
-    def getLabelExport(self):
-        cursor = self.label_db.find({},{'_id':0})
+    def getLabelExportByCategory(self,category):
+        cursor = self.label_db.find({'category':category},{'_id':0})
         data = [doc for doc in cursor]
         return data
 
@@ -258,6 +258,12 @@ class ConfigurationIO:
     def findMark(self,mark,category):
         cursor = self.label_db.find({'notation':mark,'category':category})
         return cursor.count()
+
+    def getCategoryOfDatabase(self,database):
+        print(database)
+        cursor = self.task_db.find_one({'database':database},{'category':1})
+        print(cursor)
+        return cursor['category']
 
 
 

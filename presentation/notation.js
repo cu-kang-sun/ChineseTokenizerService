@@ -193,12 +193,34 @@ var controller = new Vue({
         getRawSentence: function () {
             var self = this;
             // self.action = "正在获取";
+            if(self.category == 'classification'){
+                if(document.getElementById("radioForm").querySelector('input[name="optionsRadios"]:checked') != null)
+                    document.getElementById("radioForm").querySelector('input[name="optionsRadios"]:checked').checked=false;
+            }
+
             console.log("get raw sentence");
             $.ajax({
                 url: "/notation/get-sentence",
                 dataType: "json",
                 type: "get",
-                success: function (res) {
+                success: function (response) {
+                    var str = null;
+                    if(typeof(response) === 'object'){
+                        str = response;
+                    }else{
+                        str = JSON.parse(response);
+                    }
+
+                    console.log("get sentence result:");
+                    console.log(str);
+                    var status=str['status'];
+                    var res = str['msg'];
+                    if(status === 'fail'){
+                        alert(res);
+                        window.location.href = "configuration.html";
+                        return;
+                    }
+
 
                     console.log("get raw sentence success");
                     // self.action = "提交";
@@ -261,7 +283,7 @@ var controller = new Vue({
                     console.log(self.charInfos);
                 },
                 error: function (err) {
-                    alert("已经获取完本数据库中的句子，请返回配置页面重新选择数据库进行处理");
+                    alert("获取数据库语句出错");
                     console.log("get raw sentence fail");
                     console.log(err);
                     // window.location.replace("notation.html");
@@ -325,7 +347,12 @@ var controller = new Vue({
                 actionData['text']=self.json['text'];
                 //actionData['database']=self.json['database'];
                 actionData['category']='classification';
+                if(document.getElementById("radioForm").querySelector('input[name="optionsRadios"]:checked') == null){
+                    alert("请选择一个分类选项再提交！");
+                    return;
+                }
                 var choice=document.getElementById("radioForm").querySelector('input[name="optionsRadios"]:checked').value;
+
                 console.log("radio choice:"+ choice);
                 actionData['genre']=choice;
             }
@@ -337,6 +364,7 @@ var controller = new Vue({
                 data: JSON.stringify(actionData),
                 type: "POST",
                 success: function (res) {
+                   // document.getElementById("radioForm").querySelector('input[name="optionsRadios"]:checked').checked=false;
                     self.getRawSentence();
 
                 },

@@ -79,6 +79,16 @@ var app = new Vue({
                       alert("请选择需要上传的文件！");
                       return;
                   }
+
+                  var fileName = document.getElementById('database-file').value;
+                 // alert(typeof(document.getElementById('database-file').files[0]));
+                  if(!fileName.endsWith(".txt")){
+                      alert("请重新选择上传文件，只接受.txt类型的文件");
+                      return;
+                  }
+
+
+
                   if(document.getElementById('description').value.trim() === "") {
                       alert("请输入关于任务的描述并且描述不能为空!");
                       return;
@@ -123,6 +133,9 @@ var app = new Vue({
 
                                     },
                                     error: function (err) {
+                                        alert("上传文件出现错误，请选择另外的文件重试");
+                                        window.location.reload();
+
 
                                         console.log(err);
 

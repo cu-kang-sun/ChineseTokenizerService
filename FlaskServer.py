@@ -103,7 +103,7 @@ def database_file_upload():
     #     return json.dumps(response,ensure_ascii=False)
 
     type = request.form['type']
-    print('new database type' + type)
+    print('new database type: ' + type)
 
 
     trainedDatabase = configIO.getTrainedDatabases()
@@ -117,14 +117,20 @@ def database_file_upload():
         return json.dumps(response,ensure_ascii=False)
 
 
-
-
     print("begin upload file to database")
     f = request.files['file']
     lines = f.stream.read().decode('utf-8').split('。')
-    lines = lines[:-1]
+    if(lines[-1] == ""):
+        lines = lines[:-1]
 
+    print(lines)
+    while '\n' in lines:
+        lines.remove('\n')
 
+    while '' in lines:
+        lines.remove('')
+
+    print( lines)
 
     configIO.insertTextIntoDatabase(lines,name,type)
     response['status'] = 'success'
@@ -253,12 +259,17 @@ def notation_page():
 def get_notation_sentence():
     global cursor,database
     try:
-        return json.dumps(next(cursor))
+        result = {}
+        result['msg']=next(cursor)
+        result['status']='success'
+        return json.dumps(result, ensure_ascii=False)
     except StopIteration:
         size = nio.get_size_of_database(database)
         if size == 0:
-            print("this database has been handled , no sentences left")
-            return "no sentences, this database has a size of 0"
+            result={}
+            result['msg']="数据库"+database+"中的所有语句都已经被处理，现在返回配置界面"
+            result['status']='fail'
+            return json.dumps(result, ensure_ascii=False)
 
         cursor = nio.get_raw_randomly_fromDatabase(database)
         return get_notation_sentence()
@@ -278,13 +289,24 @@ def submit_notation_sentence():
 def export_notation_sentence():
     databases = configIO.getTrainedDatabases()
     output = {}
-    output['labels'] = configIO.getLabelExport()
-    export_content = {}
+    output['标注']={}
+    output['分类']={}
+    output['标注']['标签']=configIO.getLabelExportByCategory('notation')
+    output['分类']['标签']=configIO.getLabelExportByCategory('classification')
+
+
+    notation_content = {}
+    classification_content={}
 
     for database in databases:
-        export_content[database] = configIO.getSubmittedSentencesFromDatabase(database)
+        type = configIO.getCategoryOfDatabase(database)
+        if(type == 'notation'):
+            notation_content[database] = configIO.getSubmittedSentencesFromDatabase(database)
+        else:
+            classification_content[database] = configIO.getSubmittedSentencesFromDatabase(database)
 
-    output['results'] = export_content
+    output['标注']['数据库'] = notation_content
+    output['分类']['数据库'] = classification_content
 
 
     sentences = yaml.dump(output, allow_unicode=True)
