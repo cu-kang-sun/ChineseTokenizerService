@@ -267,7 +267,7 @@ def get_notation_sentence():
         size = nio.get_size_of_database(database)
         if size == 0:
             result={}
-            result['msg']="数据库"+database+"中的所有语句都已经被处理，现在返回配置界面"
+            result['msg']="数据库'"+database+"'中的所有语句都已经被处理，现在返回配置界面"
             result['status']='fail'
             return json.dumps(result, ensure_ascii=False)
 
@@ -380,6 +380,6 @@ def tokenize():
 
 
 if __name__ == '__main__':
-    app.run(host="localhost", port=8888)
-    #app.run(host="192.168.68.11", port=8000)
+    #app.run(host="localhost", port=8000)
+    app.run(host="192.168.68.11", port=8888)
 # end

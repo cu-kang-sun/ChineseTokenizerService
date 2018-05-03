@@ -133,7 +133,7 @@ var app = new Vue({
 
                                     },
                                     error: function (err) {
-                                        alert("上传文件出现错误，请选择另外的文件重试");
+                                        alert("上传文件出现错误，请确保您上传的文件的编码为utf-8");
                                         window.location.reload();
 
 
