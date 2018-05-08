@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for
+﻿from flask import Flask, redirect, url_for
 from flask import request
 from flask import send_from_directory
 from flask import send_file
@@ -56,38 +56,7 @@ database = ''
 def notation_configuration():
     return load_ref("configuration.html")
 
-#根据用户选择的txt文本文件，传入数据库
-@app.route('/upload', methods=['POST'])
-def upload_file():
 
-
-    name = request.form['databaseName']
-    print('new database name:' + name)
-    if(len(name) == 0):
-        return "请对您要上传的数据库进行命名，否则您将无法上传"
-
-    trainedDatabase = configIO.getTrainedDatabases()
-    untrainedDatabase = configIO.getUntrainedDatabases()
-    print("now here the databases:")
-    print(trainedDatabase)
-    print(untrainedDatabase)
-    if(name in untrainedDatabase or name in trainedDatabase):
-        return "在数据库中已经有一个名为'"+ name +"'的数据库, 请重命名您的数据库"
-
-
-
-    print("begin upload file to database")
-    f = request.files['file']
-    lines = f.stream.read().decode('utf-8').split('。')
-    lines = lines[:-1]
-
-
-
-    configIO.insertTextIntoDatabase(lines,name)
-
-    return load_ref("addDatabaseSuccess.html")
-
-    #return "ok, upload file to database success"
 
 
 #根据用户选择的txt文本文件，传入数据库
@@ -168,31 +137,6 @@ def fetch_label_byCategory():
     labels = configIO.getLabelsByCategory(category)
     print(json.dumps(labels,ensure_ascii=False))
     return json.dumps(labels,ensure_ascii=False)
-
-
-
-
-# @app.route('/configuration/submit-label', methods=['POST'])
-# def submit_labels():
-#
-#     inputData = request.get_json()
-#     pairs = inputData.get("labels")
-#     category = inputData.get("category")
-#
-#
-#     try:
-#         configIO.insertLabels(pairs,category)
-#     except:
-#         return "500"
-#     else:
-#         return "200"
-
-@app.route('/configuration/delete-unused-labels', methods=['POST'])
-def delete_unused_lables():
-    inputData = request.get_json()
-
-    category = inputData.get("category")
-
 
 
 
