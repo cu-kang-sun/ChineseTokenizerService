@@ -72,6 +72,19 @@ def notation_configuration():
     return load_ref("configuration.html")
 
 
+@app.route('/configuration/delete-db', methods=['POST'])
+def database_delete():
+    result={}
+    try:
+        postData = request.get_json()
+        dbName = postData.get("dbName")
+        configIO.deleteDb(dbName)
+    except:
+        result['status'] = 'fail'
+        return json.dumps(result,ensure_ascii=False)
+    else:
+        result['status'] = 'success'
+        return json.dumps(result,ensure_ascii=False)
 
 
 #根据用户选择的txt文本文件，传入数据库

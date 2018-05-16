@@ -5,6 +5,7 @@
 var app = new Vue({
     el: "#app",
     data: {
+
         notationPairs:[
 
         ],
@@ -14,7 +15,7 @@ var app = new Vue({
         databases:[
 
         ],
-        type:null
+        type:'notation'
     },
 
     methods: {
@@ -70,38 +71,72 @@ var app = new Vue({
             });
         },
 
-        uploadFile: function(){
+        deleteTextDb: function(category){
+            var dbName = document.getElementById(category+'-presentDb').value;
+            if(dbName.trim() === ''){
+                return;
+            }
+            var postData={};
+            postData['dbName']=dbName;
+            $.ajax({
+                url: "/configuration/delete-db",
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify(postData),
+                type: "POST",
+                success: function (res) {
+                    var response = null;
+                    if(typeof(res) === 'object'){
+                        response = res;
+                    }else{
+                        response = JSON.parse(res);
+                    }
 
-                  if(document.getElementById('database-file').value.trim() === "") {
+                    if(response['status'] === 'success'){
+                        var msg="名为'"+dbName+"'的数据库已被删除";
+                        alert(msg);
+                        document.getElementById(category+'-presentDb').value="";
+                    }else{
+                        alert("删除数据库失败!");
+                    }
+                },
+                error: function (err) {
+                    alert("删除过程出错！");
+                }
+            });
+        },
+
+        uploadFile: function(category){
+
+            var self=this;
+
+                  if(document.getElementById(category+'-file').value.trim() === "") {
                       alert("请选择需要上传的文件！");
                       return;
                   }
 
-                  var fileName = document.getElementById('database-file').value;
-                 // alert(typeof(document.getElementById('database-file').files[0]));
+                  var fileName = document.getElementById(category+'-file').value;
+
                   if(!fileName.endsWith(".txt")){
                       alert("请重新选择上传文件，只接受.txt类型的文件");
                       return;
                   }
 
-
-
-                  if(document.getElementById('description').value.trim() === "") {
+                  if(document.getElementById(category+'-description').value.trim() === "") {
                       alert("请输入关于任务的描述并且描述不能为空!");
                       return;
                   }
-                  if(document.getElementById('databaseName').value.trim() === "") {
+
+                  var name = document.getElementById(category+'-databaseName').value;;
+                  if(name.trim() === "") {
                       alert("请对您要上传的数据库进行命名，否则您将无法上传!");
                       return;
                   }
-
-
-
                       let data = new FormData();
-                      data.append('file', document.getElementById('database-file').files[0]);
-                      data.append('type',$( "#database-type" ).val());
-                      data.append('name',document.getElementById('databaseName').value);
-                      data.append('description',document.getElementById('description').value);
+                      data.append('file', document.getElementById(category+'-file').files[0]);
+                      data.append('name',name);
+                      data.append('type',$("#tabs .active").attr('value'));
+                      data.append('description',document.getElementById(category+'-description').value);
 
 
 
@@ -121,11 +156,17 @@ var app = new Vue({
                                             console.log("upload file fail");
                                             alert(response['msg']);
                                         }else{
+
+                                           // self.deleteTextDb(category);
+
                                             console.log("upload file success");
                                             alert(response['msg']);
                                             // self.getDatabases();
-                                            window.location.reload();
+                                            document.getElementById(category+"-upload").reset();
+                                            document.getElementById(category+'-presentDb').value=name;
+
                                         }
+
 
 
                                     },
@@ -191,78 +232,52 @@ var app = new Vue({
                 alert("请确保您填写的值不为空！");
                 return;
             }
-
             var value =  $("#tabs .active").attr('value');
-
             inputLabels = {};
-
             var self = this;
-
-            // var oTable = null;
-            // if(value === 'notation'){
-            //     oTable = document.getElementById('notationTable').getElementsByTagName('tbody')[0];
-            // }else{
-            //     oTable = document.getElementById('classificationTable').getElementsByTagName('tbody')[0];
-            // }
-            // //var oTable = document.getElementById('labelTable').getElementsByTagName('tbody')[0];
-            //
-            //
-            // var rowLength = oTable.rows.length;
-            //
-            // for (i = 0; i < rowLength; i++) {
-            //     var oCells = oTable.rows.item(i).cells;
-            //
-            //     singlePair = {'notation':oCells.item(0).innerText.trim(), 'label':oCells.item(1).innerText.trim(), 'category':value};
-            //     inputLabels.push(singlePair);
-            //
-            // }
-
-            inputLabels['category']=value;
             inputLabels['notation']=document.getElementById('new_mark').value;
             inputLabels['label']=document.getElementById('new_tag').value;
-
-
-
-            actionData={};
-            actionData['newPair']=JSON.stringify(inputLabels);
-            // actionData['category']=value;
-
-            console.log(actionData);
-            $.ajax({
-                url: "/configuration/submit-labeladded",
-                contentType: "application/json",
-                dataType: "json",
-                data: JSON.stringify(actionData),
-                type: "POST",
-                success: function (res) {
-                    console.log(res);
-
-                    var response = null;
-                    if(typeof(response) === 'object') {
-
-                        response=res;
-                    }else{
-                        response=JSON.parse(res);
+            if(value === 'notation') {
+                for (let pair of self.notationPairs) {
+                    if(pair['notation'] === inputLabels['notation']|| pair['label'] ===inputLabels['label']){
+                        alert("此标签已经存在！请重命名");
+                        return;
                     }
-                    if(response['status'] === 'success') {
-                        alert("您的标签已经被更新");
-                        $('#myModal').modal('hide');
-                        window.location.reload();
-                    }else{
-                        alert(response['msg']);
-                    }
-
-                },
-                error: function (err) {
-                    alert("您的标签更新出现错误");
-                    console.log(err);
-
                 }
-            })
+                self.notationPairs.push(inputLabels);
+                var tableRef = document.getElementById('notationTable').getElementsByTagName('tbody')[0];
+                var row   = tableRef.insertRow(tableRef.rows.length);
+                var cell1 = row.insertCell(0);
+                var cell2 = row.insertCell(1);
+                cell1.innerHTML = inputLabels['notation'];
+                cell2.innerHTML = inputLabels['label'];
+                console.log(self.notationPairs);
+            }else{
+                for (let pair of self.classificationPairs) {
+                    if(pair['notation'] === inputLabels['notation']|| pair['label'] ===inputLabels['label']){
+                        alert("此标签已经存在！请重命名");
+                        return;
+                    }
+                }
+                self.classificationPairs.push(inputLabels);
+                var tableRef = document.getElementById('classificationTable').getElementsByTagName('tbody')[0];
+                var row   = tableRef.insertRow(tableRef.rows.length);
+                var cell1 = row.insertCell(0);
+                var cell2 = row.insertCell(1);
+                cell1.innerHTML = inputLabels['notation'];
+                cell2.innerHTML = inputLabels['label'];
+                console.log(self.classificationPairs);
+            }
+            $('#myModal').modal('hide');
+            document.getElementById('new_mark').value = "";
+            document.getElementById('new_tag').value = "";
+            //window.location.reload();
         },
 
 
         startWork: function (category) {
+            //收集所有的标签
+            //收集文本库名称
             if(document.getElementById(category+'opts').value.trim() === ""){
                 alert("目前数据库中没有文本，请上传数据库");
                 return;
@@ -308,43 +323,9 @@ var app = new Vue({
 
                     }
                 })
-
-
-
-
-
-
-
         },
 
-        addOneRow: function () {
-            var self = this;
-            var value =  $("#tabs .active").attr('value');
-            console.log(value);
-            if(value === 'notation'){
-                self.notationPairs.push({"notation": "new Notation", "label": "new Label","category":"notation"});
-                 console.log(self.notationPairs);
-            }else{
-                self.classificationPairs.push({"notation": "new Notation", "label": "new Label","category":"classification"});
-                console.log(self.classificationPairs);
-            }
 
-
-
-        },
-        deleteLastRow: function () {
-            var self = this;
-            var value =  $("#tabs .active").attr('value');
-            if(value === 'notation') {
-                self.notationPairs.splice(-1, 1);
-                console.log(self.notationPairs)
-            }else{
-                self.classificationPairs.splice(-1, 1);
-                console.log(self.classificationPairs)
-            }
-
-
-        }
 
     }
     //,

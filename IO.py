@@ -265,7 +265,8 @@ class ConfigurationIO:
         print(cursor)
         return cursor['category']
 
-
+    def deleteDb(self,dbName):
+        self.config_db.delete_many({'database': dbName})
 
 
 

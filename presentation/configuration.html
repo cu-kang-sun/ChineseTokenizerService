@@ -42,12 +42,23 @@
 
                                         <div class="panel-body">
 
+                                                <div class="form-group">
+                                                    <span>当前已上传数据库名称</span>
+                                                    <input class="form-control" id="notation-presentDb" type="text" placeholder="" disabled="">
+                                                </div>
+                                                <div>
+                                                    <button class="btn btn-default  btn-danger" v-on:click="deleteTextDb('notation');">删除当前数据库</button>
+                                                </div>
+                                            </br>
+
                                           <!-- 数据库上传-->
                                               <div class="panel panel-default">
                                                 <div class="panel-heading">数据库上传</div>
                                                     <div class="panel-body">
 
-                                                    <form >
+
+
+                                                    <form id="notation-upload">
                                                             <input id="notation-file" type=file name=file/>
                                                             </br>
                                                             <span>请输入您要创建的数据库名字</span>
@@ -56,8 +67,10 @@
                                                             <span>请输入关于处理这个文本的任务的描述</span>
                                                             <input id="notation-description" class="form-control" />
                                                             </br>
-                                                      <button type="button" class="btn btn-default" v-on:click="uploadFile();">上传</button>
+                                                      <button type="button" class="btn btn-default" v-on:click="uploadFile('notation');">上传</button>
                                                     </form>
+
+
 
                                                 </div>
                                               </div>
@@ -73,9 +86,6 @@
 
                                                 <table id="notationTable"  class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline"
                                                        style="width:100%;table-layout:fixed;overflow:hidden;" border="1" >
-
-
-
                                                         <thead>
                                                             <tr>
                                                                 <th>标注</th>
@@ -84,15 +94,8 @@
                                                         </thead>
 
                                                     <tbody>
-
-
-
-                                                    <tr v-for="pair in notationPairs" >
-                                                        <template v-if="pair.category === 'notation'">
-                                                        <td> <div class =" notationInTable" > {{pair.notation}} </div> </td>
-                                                        <td> <div class =" labelInTable"> {{pair.label}}    </div> </td>
-                                                            </template>
-                                                    </tr>
+                                                        <tr >
+                                                        </tr>
                                                     </tbody>
 
                                                 </table>
@@ -105,34 +108,20 @@
                                                           <button class="btn btn-default btn-success" v-on:click="submitLabelChanges();">提交编辑</button>       -->
                                                       </div>
                                                   </div>
-                                    </div>
+                                                </div>
                                             </div>
-
-
                                     </div>
 
 
 
-                                              <div class="panel panel-default">
-                                              <div class="panel-heading">选择数据库开始工作</div>
-                                                  <div class="panel-collapse collapse in">
 
 
-                                                      <div class="panel-body">
-                                                        <div class="form-group">
-                                                            <span>选择您要操作的文本库</span>
-                                                            <select class="form-control" id="notationopts">
-                                                                <option v-for="database in databases" v-if="database.category==='notation'" >{{ database.name }}</option>
-                                                            </select>
 
-                                                        </div>
-                                                        <button class="btn btn-default btn-success" v-on:click="startWork('notation');"                >开始标注</button>
+                                        </br>
+                                    <div>
+                                    <button class="btn btn-default btn-success" v-on:click="startWork('notation');">上传标注任务</button>
+                                    </div>
 
-                                                      </div>
-                                                  </div>
-
-
-                                                  </div>
 
 
 
@@ -147,12 +136,20 @@
 
                                         <div class="panel-body">
 
+                                             <div class="form-group">
+                                                    <span>当前已上传数据库名称</span>
+                                                    <input class="form-control" id="class-presentDb" type="text" placeholder="" disabled="">
+                                                </div>
+                                                <div>
+                                                    <button class="btn btn-default  btn-danger" v-on:click="deleteTextDb('class');">删除当前数据库</button>
+                                                </div>
+                                            </br>
                                                <!-- 数据库上传-->
                                               <div class="panel panel-default">
                                                 <div class="panel-heading">数据库上传</div>
                                                     <div class="panel-body">
 
-                                                  <form >
+                                                  <form id="class-upload">
                                                             <input id="class-file" type=file name=file/>
                                                             </br>
                                                             <span>请输入您要创建的数据库名字</span>
@@ -161,7 +158,7 @@
                                                             <span>请输入关于处理这个文本的任务的描述</span>
                                                             <input id="class-description" class="form-control" />
                                                             </br>
-                                                      <button type="button" class="btn btn-default" v-on:click="uploadFile();">上传</button>
+                                                      <button type="button" class="btn btn-default" v-on:click="uploadFile('class');">上传</button>
                                                     </form>
 
                                                 </div>
@@ -191,15 +188,8 @@
                                                             </thead>
 
                                                         <tbody>
-
-
-
-                                                        <tr v-for="pair in classificationPairs" >
-                                                        <template v-if="pair.category === 'classification'">
-                                                        <td> <div class =" notationInTable" > {{pair.notation}} </div> </td>
-                                                        <td> <div class =" labelInTable" > {{pair.label}}    </div> </td>
-                                                            </template>
-                                                    </tr>
+                                                            <tr >
+                                                            </tr>
                                                         </tbody>
 
                                                     </table>
@@ -233,26 +223,8 @@
                                       </div>
 
 
-                                                <div class="panel panel-default">
-                                              <div class="panel-heading">选择数据库开始工作</div>
+                                                  <button class="btn btn-default btn-warning" v-on:click="startWork('classification');"        >上传分类任务</button>
 
-                                                    <div class="panel-collapse collapse in">
-
-                                              <div class="panel-body">
-                                                <div class="form-group">
-                                                    <span>选择您要操作的文本库</span>
-                                                    <select class="form-control" id="classificationopts">
-                                                        <option v-for="database in databases" v-if="database.category==='classification'">{{ database.name }}</option>
-                                                    </select>
-
-                                                </div>
-
-                                                  <button class="btn btn-default btn-warning" v-on:click="startWork('classification');"        >开始分类</button>
-                                              </div>
-
-                                                    </div>
-
-                                                  </div>
                                   </div>
                                 </div>
                                   </div>
