@@ -30,16 +30,13 @@ var app = new Vue({
                     for (var i=0; i < jsonObj.length; i++) {
                         self.databases.push(jsonObj[i]);
                     }
-
                     console.log(self.databases);
                 },
                 error: function (error) {
                     console.log(error);
                 }
             });
-
         },
-
 
         abandonLabelChanges: function() {
             location.reload();
@@ -262,10 +259,6 @@ var app = new Vue({
 
                 }
             })
-
-
-
-
         },
 
 
@@ -353,10 +346,11 @@ var app = new Vue({
 
         }
 
-    },
-    beforeMount(){
-        this.getLabels();
-        this.getDatabases();
     }
+    //,
+    // beforeMount(){
+    //     this.getLabels();
+    //     this.getDatabases();
+    // }
 
 });

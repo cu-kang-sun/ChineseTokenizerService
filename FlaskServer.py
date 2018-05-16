@@ -50,7 +50,22 @@ category = ''
 configIO = ConfigurationIO()
 database = ''
 
+@app.route('/login', methods=['GET'])
+def log_in():
+    #传入数据
+    #username 已做非空判断
+    #password 已做非空判断
+    #role(用户角色)，如果是众包用户就是user,如果是管理员就是manager
+    #前端会判断是否为空，后端判断是否合法，返回信息
+    #返回格式{'status':'fail','msg':'密码错误'} / {‘status':'success','msg':'登陆成功'}
 
+    postData = request.get_json()
+    username = postData.get("username")
+    pwd = postData.get("password")
+    role=postData.get("role")
+
+
+    return;
 
 @app.route('/configuration', methods=['GET'])
 def notation_configuration():
@@ -324,6 +339,6 @@ def tokenize():
 
 
 if __name__ == '__main__':
-    #app.run(host="localhost", port=8000)
-    app.run(host="192.168.68.11", port=8888)
+    app.run(host="localhost", port=8000)
+    #app.run(host="192.168.68.11", port=8888)
 # end

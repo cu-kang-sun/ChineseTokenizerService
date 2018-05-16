@@ -16,17 +16,9 @@
 <body>
 <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
             <div class="navbar-header">
-
                 <a class="navbar-brand">文本标注辅助系统</a>
             </div>
-            <!-- /.navbar-header -->
-
-
-
-        </nav>
-
-
-
+</nav>
 
 
 <div id="app" >
@@ -34,55 +26,6 @@
         <div class="col-lg-12">
 
 
-
-      <div class="panel panel-default">
-        <div class="panel-heading">数据库上传</div>
-            <div class="panel-body">
-
-<!--action="upload"  method=post  -->
-          <form >
-                    <input id="database-file" type=file name=file/>
-                    </br>
-                    <span>请输入您要创建的数据库名字</span>
-                    <input id="databaseName" class="form-control" name="databaseName"/>
-                    </br>
-                                            <span>请选择数据库类型</span>
-                                            <select class="form-control" id="database-type">
-                                                <option value="notation"> 标注</option>
-                                                <option value="classification">分类</option>
-
-                                            </select>
-                </br>
-
-                    <span>请输入关于处理这个文本的任务的描述</span>
-                    <input id="description" class="form-control" />
-                    </br>
-              <button type="button" class="btn btn-default" v-on:click="uploadFile();">上传</button>
-            </form>
-
-
-
-
-
-
-        </div>
-      </div>
-
-
-
-
-
-
-
-
-
-<!--
-
-      <div class="panel panel-default">
-      <div class="panel-heading">标签编辑栏</div>
-      <div class="panel-body">
-
--->
           <ul class="nav nav-tabs" id="tabs">
                                 <li value="notation" class="active"  id="test"><a href="#notation" data-toggle="tab" aria-expanded="true">标注</a>
                                 </li>
@@ -92,15 +35,34 @@
 
           <div class="tab-content">
 
-
-
-
-
                                 <div class="tab-pane fade active in" id="notation">
                                     <div class="panel panel-default">
 
+
+
                                         <div class="panel-body">
 
+                                          <!-- 数据库上传-->
+                                              <div class="panel panel-default">
+                                                <div class="panel-heading">数据库上传</div>
+                                                    <div class="panel-body">
+
+                                                    <form >
+                                                            <input id="notation-file" type=file name=file/>
+                                                            </br>
+                                                            <span>请输入您要创建的数据库名字</span>
+                                                            <input id="notation-databaseName" class="form-control" name="databaseName"/>
+                                                            </br>
+                                                            <span>请输入关于处理这个文本的任务的描述</span>
+                                                            <input id="notation-description" class="form-control" />
+                                                            </br>
+                                                      <button type="button" class="btn btn-default" v-on:click="uploadFile();">上传</button>
+                                                    </form>
+
+                                                </div>
+                                              </div>
+
+                                    <!-- 编辑标签-->
                                     <div class="panel panel-default">
                                         <div class="panel-heading">标签编辑栏</div>
 
@@ -185,8 +147,30 @@
 
                                         <div class="panel-body">
 
+                                               <!-- 数据库上传-->
+                                              <div class="panel panel-default">
+                                                <div class="panel-heading">数据库上传</div>
+                                                    <div class="panel-body">
+
+                                                  <form >
+                                                            <input id="class-file" type=file name=file/>
+                                                            </br>
+                                                            <span>请输入您要创建的数据库名字</span>
+                                                            <input id="class-databaseName" class="form-control" name="databaseName"/>
+                                                            </br>
+                                                            <span>请输入关于处理这个文本的任务的描述</span>
+                                                            <input id="class-description" class="form-control" />
+                                                            </br>
+                                                      <button type="button" class="btn btn-default" v-on:click="uploadFile();">上传</button>
+                                                    </form>
+
+                                                </div>
+                                              </div>
+
 
                                     <div class="panel panel-default">
+
+
                                         <div class="panel-heading">标签编辑栏</div>
 
                                         <div class="panel-collapse collapse in">
