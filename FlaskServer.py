@@ -128,15 +128,29 @@ def database_file_upload():
         lines.remove('')
 
     print( lines)
-
-    configIO.insertTextIntoDatabase(lines,name,type)
+    configIO.insertTextIntoDatabase(lines, name, type)
     response['status'] = 'success'
     response['msg'] = "上传文件成功，成功存入数据库！"
 
-    configIO.insertTask(name,type,description)
     return json.dumps(response,ensure_ascii=False)
 
 
+#管理员提交任务
+@app.route('/configuration/uploadTask', methods=['POST'])
+def task_upload():
+    response = {}
+    try:
+        postData = request.get_json()
+        type = postData.get("category")
+        dbname = postData.get("database")
+        tag = postData.get("tags")
+        configIO.insertTask(dbname,type,tag)
+    except:
+        response['status'] = 'fail'
+        return json.dumps(response, ensure_ascii=False)
+    else:
+        response['status'] = 'success'
+        return json.dumps(response, ensure_ascii=False)
 
 #查所有还没有被训练的数据库名称
 @app.route('/configuration/getDatabases', methods=['GET'])

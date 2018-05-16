@@ -162,8 +162,30 @@ var app = new Vue({
                                             console.log("upload file success");
                                             alert(response['msg']);
                                             // self.getDatabases();
+
+                                            //删除原来的文件
+                                            var dbName = document.getElementById(category+'-presentDb').value;
                                             document.getElementById(category+"-upload").reset();
                                             document.getElementById(category+'-presentDb').value=name;
+                                            if(dbName.trim() === ''){
+                                                return;
+                                            }
+                                            var postData={};
+                                            postData['dbName']=dbName;
+                                            $.ajax({
+                                                url: "/configuration/delete-db",
+                                                contentType: "application/json",
+                                                dataType: "json",
+                                                data: JSON.stringify(postData),
+                                                type: "POST",
+                                                success: function (res) {
+                                                    console.log(res);
+                                                },
+                                                error: function (err) {
+                                                    alert("删除原数据库出错！");
+                                                }
+                                            });
+
 
                                         }
 
@@ -214,13 +236,10 @@ var app = new Vue({
                 type: "POST",
                 success: function (res) {
                     console.log(res);
-
-
                 },
                 error: function (err) {
                     alert("您的标签删除出现错误");
                     console.log(err);
-
                 }
             });
 
@@ -276,49 +295,78 @@ var app = new Vue({
 
 
         startWork: function (category) {
+            var self = this;
             //收集所有的标签
             //收集文本库名称
-            if(document.getElementById(category+'opts').value.trim() === ""){
-                alert("目前数据库中没有文本，请上传数据库");
+            if(document.getElementById(category+'-presentDb').value.trim() === ""){
+                alert("目前尚未上传数据库，请上传数据库");
                 return;
             }
 
-            var oTable = null;
+            var length = 0;
+            var tags = [];
             if(category === 'notation'){
-                oTable = document.getElementById('notationTable').getElementsByTagName('tbody')[0];
+                length = self.notationPairs.length;
+                tags = self.notationPairs;
             }else{
-                oTable = document.getElementById('classificationTable').getElementsByTagName('tbody')[0];
+                length = self.classificationPairs.length;
+                tags = self.classificationPairs;
             }
-            //var oTable = document.getElementById('labelTable').getElementsByTagName('tbody')[0];
 
-
-            var rowLength = oTable.rows.length;
-            if(rowLength == 0){
+            if(length == 0){
                 alert("您尚未设置任何用于使用的标签，请添加标签后再进行工作");
                 return;
             }
-            // alert(rowLength);
-
 
                 actionData = {};
-                var name = category + 'opts';
-                actionData['database']=$( "#"+name ).val();
-                // alert( actionData['database']);
-                actionData['category']=category;
+                actionData['database']=document.getElementById(category+'-presentDb').value;
+                if(category === 'notation')
+                    actionData['category']=category;
+                else
+                    actionData['category'] = 'classification'
+                actionData['tags']=tags;
                 console.log('actionData');
                 console.log(actionData);
 
                 $.ajax({
-                    url: "/configuration/start-notation",
+                    url: "/configuration/uploadTask",
                     contentType: "application/json",
                     dataType: "json",
                     data: JSON.stringify(actionData),
                     type: "POST",
                     success: function (res) {
-                         window.location.replace("notation.html");
+                        var response = null;
+                        if(typeof(res) === 'object'){
+                            response = res;
+                        }else{
+                            response = JSON.parse(res);
+                        }
+                        console.log(response);
+                        if(response['status'] === 'success'){
+                            alert("上传任务成功!");
+                            //clear all tables and inputs
+
+                            document.getElementById(category+'-presentDb').value="";
+                            document.getElementById(category+"-upload").reset();
+
+                            if(category === 'notation'){
+                                self.notationPairs = [];
+                                $("#notationTable tbody tr").remove();
+                            }else{
+                                self.classificationPairs = [];
+                                $("#classificationTable tbody tr").remove();
+
+                            }
+
+
+                        }else{
+                            alert("上传任务失败!");
+                        }
+
 
                     },
                     error: function (err) {
+                        alert("上传任务失败!");
                         console.log(err);
 
                     }

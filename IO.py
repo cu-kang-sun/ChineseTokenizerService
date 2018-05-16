@@ -222,11 +222,12 @@ class ConfigurationIO:
         #self.config_db.delete_many({})
         self.config_db.insert(json.loads(saveJsonObj))
 
-    def insertTask(self,databaseName, type, description):
+
+    def insertTask(self,databaseName, type, tags):
         task = {}
         task['database']=databaseName
         task['category']=type
-        task['description']=description
+        task['tags']=tags
         task['timeAdded']=strftime("%Y-%m-%d %H:%M:%S", gmtime())
         self.task_db.insert(task)
 

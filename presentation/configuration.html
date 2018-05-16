@@ -15,300 +15,280 @@
 
 <body>
 <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
-            <div class="navbar-header">
-                <a class="navbar-brand">文本标注辅助系统</a>
-            </div>
+    <div class="navbar-header">
+        <a class="navbar-brand">文本标注辅助系统</a>
+    </div>
 </nav>
 
 
-<div id="app" >
+<div id="app">
     <div class="row">
         <div class="col-lg-12">
 
 
-          <ul class="nav nav-tabs" id="tabs">
-                                <li value="notation" class="active"  id="test"><a href="#notation" data-toggle="tab" aria-expanded="true">标注</a>
-                                </li>
-                                <li value="classification" class="" ><a href="#classification" data-toggle="tab" aria-expanded="false">分类</a>
-                                </li>
-          </ul>
+            <ul class="nav nav-tabs" id="tabs">
+                <li value="notation" class="active" id="test"><a href="#notation" data-toggle="tab"
+                                                                 aria-expanded="true">标注</a>
+                </li>
+                <li value="classification" class=""><a href="#classification" data-toggle="tab"
+                                                       aria-expanded="false">分类</a>
+                </li>
+            </ul>
 
-          <div class="tab-content">
+            <div class="tab-content">
 
-                                <div class="tab-pane fade active in" id="notation">
-                                    <div class="panel panel-default">
-
-
-
-                                        <div class="panel-body">
-
-                                                <div class="form-group">
-                                                    <span>当前已上传数据库名称</span>
-                                                    <input class="form-control" id="notation-presentDb" type="text" placeholder="" disabled="">
-                                                </div>
-                                                <div>
-                                                    <button class="btn btn-default  btn-danger" v-on:click="deleteTextDb('notation');">删除当前数据库</button>
-                                                </div>
-                                            </br>
-
-                                          <!-- 数据库上传-->
-                                              <div class="panel panel-default">
-                                                <div class="panel-heading">数据库上传</div>
-                                                    <div class="panel-body">
+                <div class="tab-pane fade active in" id="notation">
+                    <div class="panel panel-default">
 
 
+                        <div class="panel-body">
 
-                                                    <form id="notation-upload">
-                                                            <input id="notation-file" type=file name=file/>
-                                                            </br>
-                                                            <span>请输入您要创建的数据库名字</span>
-                                                            <input id="notation-databaseName" class="form-control" name="databaseName"/>
-                                                            </br>
-                                                            <span>请输入关于处理这个文本的任务的描述</span>
-                                                            <input id="notation-description" class="form-control" />
-                                                            </br>
-                                                      <button type="button" class="btn btn-default" v-on:click="uploadFile('notation');">上传</button>
-                                                    </form>
+                            <div class="form-group">
+                                <span>当前已上传数据库名称</span>
+                                <input class="form-control" id="notation-presentDb" type="text" placeholder=""
+                                       disabled="">
+                            </div>
+                            <div>
+                                <button class="btn btn-default  btn-danger" v-on:click="deleteTextDb('notation');">
+                                    删除当前数据库
+                                </button>
+                            </div>
+                            </br>
 
-
-
-                                                </div>
-                                              </div>
-
-                                    <!-- 编辑标签-->
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">标签编辑栏</div>
+                            <!-- 数据库上传-->
+                            <div class="panel panel-default">
+                                <div class="panel-heading">数据库上传</div>
+                                <div class="panel-body">
 
 
-                                        <div class="panel-collapse collapse in">
-                                    <div class="panel-body">
-                                          <div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
-
-                                                <table id="notationTable"  class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline"
-                                                       style="width:100%;table-layout:fixed;overflow:hidden;" border="1" >
-                                                        <thead>
-                                                            <tr>
-                                                                <th>标注</th>
-                                                                <th>标签</th>
-                                                            </tr>
-                                                        </thead>
-
-                                                    <tbody>
-                                                        <tr >
-                                                        </tr>
-                                                    </tbody>
-
-                                                </table>
-
-                                                      <div class="row" style="margin: 0 auto;text-align: center;">
-                                                          <button type="button" class="btn btn-default btn-primary" data-toggle="modal" data-target="#myModal" v-on:click="decideType();">增加一行</button>
-                                              <!--            <button class="btn btn-default btn-danger" v-on:click="deleteAllUnusedRows();">删除所有未使用过的标签</button>
-                                                                                    <button class="btn btn-default btn-warning" v-on:click="deleteLastRow();">删除最后行</button>
-                                                          <button class="btn btn-default btn-danger" v-on:click="abandonLabelChanges();">放弃编辑</button>
-                                                          <button class="btn btn-default btn-success" v-on:click="submitLabelChanges();">提交编辑</button>       -->
-                                                      </div>
-                                                  </div>
-                                                </div>
-                                            </div>
-                                    </div>
-
-
-
-
-
-
+                                    <form id="notation-upload">
+                                        <input id="notation-file" type=file name=file/>
                                         </br>
-                                    <div>
-                                    <button class="btn btn-default btn-success" v-on:click="startWork('notation');">上传标注任务</button>
-                                    </div>
+                                        <span>请输入您要创建的数据库名字</span>
+                                        <input id="notation-databaseName" class="form-control" name="databaseName"/>
+                                        </br>
+                                        <span>请输入关于处理这个文本的任务的描述</span>
+                                        <input id="notation-description" class="form-control"/>
+                                        </br>
+                                        <button type="button" class="btn btn-default"
+                                                v-on:click="uploadFile('notation');">上传
+                                        </button>
+                                    </form>
 
 
+                                </div>
+                            </div>
+
+                            <!-- 编辑标签-->
+                            <div class="panel panel-default">
+                                <div class="panel-heading">标签编辑栏</div>
 
 
+                                <div class="panel-collapse collapse in">
+                                    <div class="panel-body">
+                                        <div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
 
+                                            <table id="notationTable"
+                                                   class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline"
+                                                   style="width:100%;table-layout:fixed;overflow:hidden;" border="1">
+                                                <thead>
+                                                <tr>
+                                                    <th>标注</th>
+                                                    <th>标签</th>
+                                                </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                <tr>
+                                                </tr>
+                                                </tbody>
+
+                                            </table>
+
+                                            <div class="row" style="margin: 0 auto;text-align: center;">
+                                                <button type="button" class="btn btn-default btn-primary"
+                                                        data-toggle="modal" data-target="#myModal"
+                                                        v-on:click="decideType();">增加一行
+                                                </button>
+                                                <!--            <button class="btn btn-default btn-danger" v-on:click="deleteAllUnusedRows();">删除所有未使用过的标签</button>
+                                                                                      <button class="btn btn-default btn-warning" v-on:click="deleteLastRow();">删除最后行</button>
+                                                            <button class="btn btn-default btn-danger" v-on:click="abandonLabelChanges();">放弃编辑</button>
+                                                            <button class="btn btn-default btn-success" v-on:click="submitLabelChanges();">提交编辑</button>       -->
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                  <div class="tab-pane fade" id="classification">
-
-                                      <div class="panel panel-default">
-
-                                        <div class="panel-body">
-
-                                             <div class="form-group">
-                                                    <span>当前已上传数据库名称</span>
-                                                    <input class="form-control" id="class-presentDb" type="text" placeholder="" disabled="">
-                                                </div>
-                                                <div>
-                                                    <button class="btn btn-default  btn-danger" v-on:click="deleteTextDb('class');">删除当前数据库</button>
-                                                </div>
-                                            </br>
-                                               <!-- 数据库上传-->
-                                              <div class="panel panel-default">
-                                                <div class="panel-heading">数据库上传</div>
-                                                    <div class="panel-body">
-
-                                                  <form id="class-upload">
-                                                            <input id="class-file" type=file name=file/>
-                                                            </br>
-                                                            <span>请输入您要创建的数据库名字</span>
-                                                            <input id="class-databaseName" class="form-control" name="databaseName"/>
-                                                            </br>
-                                                            <span>请输入关于处理这个文本的任务的描述</span>
-                                                            <input id="class-description" class="form-control" />
-                                                            </br>
-                                                      <button type="button" class="btn btn-default" v-on:click="uploadFile('class');">上传</button>
-                                                    </form>
-
-                                                </div>
-                                              </div>
+                            </div>
 
 
-                                    <div class="panel panel-default">
+                            </br>
+                            <div>
+                                <button class="btn btn-default btn-success" v-on:click="startWork('notation');">上传标注任务
+                                </button>
+                            </div>
 
 
-                                        <div class="panel-heading">标签编辑栏</div>
+                        </div>
+                    </div>
+                </div>
 
-                                        <div class="panel-collapse collapse in">
+                <div class="tab-pane fade" id="classification">
 
-                                      <div class="panel-body">
-                                      <div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+                    <div class="panel panel-default">
 
-                                                    <table id="classificationTable"  class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline"
-                                                           style="width:100%;table-layout:fixed;overflow:hidden;" border="1" >
+                        <div class="panel-body">
 
+                            <div class="form-group">
+                                <span>当前已上传数据库名称</span>
+                                <input class="form-control" id="class-presentDb" type="text" placeholder="" disabled="">
+                            </div>
+                            <div>
+                                <button class="btn btn-default  btn-danger" v-on:click="deleteTextDb('class');">
+                                    删除当前数据库
+                                </button>
+                            </div>
+                            </br>
+                            <!-- 数据库上传-->
+                            <div class="panel panel-default">
+                                <div class="panel-heading">数据库上传</div>
+                                <div class="panel-body">
 
+                                    <form id="class-upload">
+                                        <input id="class-file" type=file name=file/>
+                                        </br>
+                                        <span>请输入您要创建的数据库名字</span>
+                                        <input id="class-databaseName" class="form-control" name="databaseName"/>
+                                        </br>
+                                        <span>请输入关于处理这个文本的任务的描述</span>
+                                        <input id="class-description" class="form-control"/>
+                                        </br>
+                                        <button type="button" class="btn btn-default" v-on:click="uploadFile('class');">
+                                            上传
+                                        </button>
+                                    </form>
 
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>类别</th>
-                                                                    <th>标签</th>
-                                                                </tr>
-                                                            </thead>
-
-                                                        <tbody>
-                                                            <tr >
-                                                            </tr>
-                                                        </tbody>
-
-                                                    </table>
-
-                                                          <div class="row" style="margin: 0 auto;text-align: center;">
-                                                              <button type="button" class="btn btn-default btn-primary" data-toggle="modal" data-target="#myModal" v-on:click="decideType();">增加一行 </button>
-                                             <!--                 <button class="btn btn-default btn-warning" v-on:click="deleteLastRow();">删除最后行</button>
-                                                              <button class="btn btn-default btn-danger" v-on:click="abandonLabelChanges();">放弃编辑</button>
-                                                              <button class="btn btn-default btn-success" v-on:click="submitLabelChanges();">提交编辑</button>  -->
-                                                          </div>
-                                                      </div>
-
-
-
-
-
-
-
-                                      </div>
-
-
+                                </div>
+                            </div>
 
 
+                            <div class="panel panel-default">
 
 
+                                <div class="panel-heading">标签编辑栏</div>
+
+                                <div class="panel-collapse collapse in">
+
+                                    <div class="panel-body">
+                                        <div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+
+                                            <table id="classificationTable"
+                                                   class="table table-striped table-bordered table-hover dataTable no-footer dtr-inline"
+                                                   style="width:100%;table-layout:fixed;overflow:hidden;" border="1">
 
 
+                                                <thead>
+                                                <tr>
+                                                    <th>类别</th>
+                                                    <th>标签</th>
+                                                </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                <tr>
+                                                </tr>
+                                                </tbody>
+
+                                            </table>
+
+                                            <div class="row" style="margin: 0 auto;text-align: center;">
+                                                <button type="button" class="btn btn-default btn-primary"
+                                                        data-toggle="modal" data-target="#myModal"
+                                                        v-on:click="decideType();">增加一行
+                                                </button>
+                                                <!--                 <button class="btn btn-default btn-warning" v-on:click="deleteLastRow();">删除最后行</button>
+                                                                 <button class="btn btn-default btn-danger" v-on:click="abandonLabelChanges();">放弃编辑</button>
+                                                                 <button class="btn btn-default btn-success" v-on:click="submitLabelChanges();">提交编辑</button>  -->
+                                            </div>
                                         </div>
 
 
-                                      </div>
+                                    </div>
 
 
-                                                  <button class="btn btn-default btn-warning" v-on:click="startWork('classification');"        >上传分类任务</button>
-
-                                  </div>
                                 </div>
-                                  </div>
-
-
-
 
 
                             </div>
 
 
+                            <button class="btn btn-default btn-warning" v-on:click="startWork('class');">上传分类任务</button>
+
+                        </div>
+                    </div>
+                </div>
 
 
+            </div>
 
 
-<!--
+            <!--
 
 
-      </div>
-
-
-
-
-
-      </div>
-
--->
+                  </div>
 
 
 
 
 
+                  </div>
+
+            -->
 
 
         </div>
     </div>
 
 
-
-
-
-
-
-<!-- 模态框（Modal） -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-					&times;
-				</button>
-				<h4 class="modal-title" id="myModalLabel">
-					标签添加栏
-				</h4>
-			</div>
-			<div class="modal-body">
-					<form class="bs-example bs-example-form" role="form">
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        标签添加栏
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <form class="bs-example bs-example-form" role="form">
                         <div class="input-group">
                             <span class="input-group-addon">{{ type }}：</span>
                             <input type="text" class="form-control" id="new_mark">
-                        </div><br>
+                        </div>
+                        <br>
                         <div class="input-group">
                             <span class="input-group-addon">标签：</span>
                             <input type="text" class="form-control" id="new_tag">
                         </div>
                     </form>
 
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-warning" data-dismiss="modal">放弃编辑
-				</button>
-				<button type="button" class="btn btn-success" v-on:click="submitLabelChanges();">
-					提交编辑
-				</button>
-			</div>
-		</div><!-- /.modal-content -->
-	</div><!-- /.modal -->
-</div>
-
-
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">放弃编辑
+                    </button>
+                    <button type="button" class="btn btn-success" v-on:click="submitLabelChanges();">
+                        提交编辑
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
 
 
 </div>
-    <script src="/configuration.js"></script>
+<script src="/configuration.js"></script>
 
 <script src="/bootstrap.min.js"></script>
 
