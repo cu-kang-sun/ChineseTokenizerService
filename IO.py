@@ -10,8 +10,8 @@ class NotationIO:
     def __init__(self):
         # self.test_db = MongoClient('localhost', 20000).get_database("tokenizer_qiao").get_collection('sentences_sample')
         self.test_db = MongoClient('localhost', 20000).get_database("tokenizer_qiao").get_collection(
-            #'sentence4test')
-        'TextLibrary')
+            # 'sentence4test')
+            'TextLibrary')
 
         self.test_size = self.test_db.find().count()
         self.test_cursor = self.test_db.find()
@@ -23,17 +23,14 @@ class NotationIO:
             if random.random() > 0.3:
                 yield doc
 
-
-    def get_raw_randomly_fromDatabase(self,database):
-        cursor = self.test_db.find({'database':database})
+    def get_raw_randomly_fromDatabase(self, database):
+        cursor = self.test_db.find({'database': database})
         for doc in cursor:
-            if random.random() > 0.3:
+            if random.random() < 0.2:
                 yield doc
 
-    def get_size_of_database(self,database):
-        return self.test_db.find({'database':database}).count()
-
-
+    def get_size_of_database(self, database):
+        return self.test_db.find({'database': database}).count()
 
     def move_to_train(self, noted_doc):
         doc = noted_doc
@@ -46,14 +43,6 @@ class NotationIO:
         cursor = self.train_db.find({})
         sentences = [doc for doc in cursor]
         return sentences
-
-
-
-
-
-
-
-
 
 
 class RemoteIO:
@@ -175,7 +164,6 @@ class DisIO:
         dis.close()
 
 
-
 class ConfigurationIO:
     def __init__(self):
         self.config_db = MongoClient('localhost', 20000).get_database("tokenizer_qiao").get_collection(
@@ -184,108 +172,57 @@ class ConfigurationIO:
         self.train_db = MongoClient('localhost', 20000).get_database("tokenizer_qiao").get_collection(
             'TextTrained')
 
-        self.label_db = MongoClient('localhost', 20000).get_database("tokenizer_qiao").get_collection(
-            'Labels')
+        # self.label_db = MongoClient('localhost', 20000).get_database("tokenizer_qiao").get_collection(
+        #     'Labels')
 
         self.task_db = MongoClient('localhost', 20000).get_database("tokenizer_qiao").get_collection(
             'Tasks')
 
-        # self.label_db.delete_many({})
-        # labels = [{"notation": "人名&机构名", "label": "protagonist"}, {"notation": "地名", "label": "location"},
-        #           {"notation": "法规名", "label": "regulation"}]
-        # for obj in labels:
-        #     self.label_db.insert_one({'notation': obj['notation'], 'label': obj['label'], 'category' : 'notation'})
-        #     self.label_db.insert_one({'notation': obj['notation'], 'label': obj['label'], 'category' : 'classification'})
 
         print('configuration initialization done')
 
-
-    def insertTextIntoDatabase(self, sentences,database):
-        if(self.config_db.find().count() == 0 and self.train_db.find().count() == 0):
+    def insertTextIntoDatabase(self, sentences, database):
+        if (self.config_db.find().count() == 0 and self.train_db.find().count() == 0):
             max_id = 0
 
-        elif(self.config_db.find().count() == 0 and self.train_db.find().count() != 0):
+        elif (self.config_db.find().count() == 0 and self.train_db.find().count() != 0):
             max_id = self.train_db.find_one(sort=[("_id", -1)])["_id"]
 
         elif (self.config_db.find().count() != 0 and self.train_db.find().count() == 0):
             max_id = self.config_db.find_one(sort=[("_id", -1)])["_id"]
 
-        elif(self.config_db.find().count() != 0 and self.train_db.find().count() != 0):
-            max_id = max(self.config_db.find_one(sort=[("_id", -1)])["_id"],self.train_db.find_one(sort=[("_id", -1)])["_id"])
+        elif (self.config_db.find().count() != 0 and self.train_db.find().count() != 0):
+            max_id = max(self.config_db.find_one(sort=[("_id", -1)])["_id"],
+                         self.train_db.find_one(sort=[("_id", -1)])["_id"])
 
-
-
-
-        sentence_state = [{"_id": index+1+max_id, "text": s, "database":database} for index, s in enumerate(sentences)]
-        saveJsonObj = json.dumps(sentence_state,ensure_ascii=False)
+        sentence_state = [{"_id": index + 1 + max_id, "text": s, "database": database} for index, s in
+                          enumerate(sentences)]
+        saveJsonObj = json.dumps(sentence_state, ensure_ascii=False)
         print(saveJsonObj)
-        #self.config_db.delete_many({})
+        # self.config_db.delete_many({})
         self.config_db.insert(json.loads(saveJsonObj))
 
-
-    def insertTask(self,databaseName, type, tags,description):
+    def insertTask(self, databaseName, type, tags, description):
         task = {}
-        task['database']=databaseName
-        task['category']=type
+        task['database'] = databaseName
+        task['category'] = type
         task['description'] = description
-        task['tags']=tags
-        task['timeAdded']=strftime("%Y-%m-%d %H:%M:%S", gmtime())
+        task['tags'] = tags
+        task['timeAdded'] = strftime("%Y-%m-%d %H:%M:%S", gmtime())
         self.task_db.insert(task)
 
-
-
-    def getLabels(self):
-        cursor = self.label_db.find({})
-        notationToLabel = [{"notation" : doc['notation'], "label" : doc['label'] ,'category':doc['category']} for doc in cursor]
-        return notationToLabel
-
-    def getLabelsByCategory(self,category):
-        cursor = self.label_db.find({'category':category})
-        notationToLabel = [{"notation": doc['notation'], "label": doc['label'],'category':doc['category']} for doc in
-                           cursor]
-        return notationToLabel
-
-
-
-
-    def getLabelExportByCategory(self,category):
-        cursor = self.label_db.find({'category':category},{'_id':0})
-        data = [doc for doc in cursor]
-        return data
-
-    def findLabel(self,label,category):
-        cursor = self.label_db.find({'label':label,'category':category})
-        return cursor.count()
-
-    def findMark(self,mark,category):
-        cursor = self.label_db.find({'notation':mark,'category':category})
-        return cursor.count()
-
-    def getCategoryOfDatabase(self,database):
+    def getCategoryOfDatabase(self, database):
         print(database)
-        cursor = self.task_db.find_one({'database':database},{'category':1})
+        cursor = self.task_db.find_one({'database': database}, {'category': 1})
         print(cursor)
         return cursor['category']
 
-    def deleteDb(self,dbName):
+    def deleteDb(self, dbName):
         self.config_db.delete_many({'database': dbName})
 
 
-
-
-    def insertOneLabel(self,labelPair):
-        print(labelPair)
-        self.label_db.insert(labelPair)
-
-
-    def insertLabels(self, labelPairs,category):
-        print(labelPairs)
-        self.label_db.delete_many({'category':category})
-        self.label_db.insert(json.loads(labelPairs))
-
-
     def getTrainedDatabases(self):
-        cursor = self.train_db.find({'_id':{'$gt': 0}} , {'database':1 })
+        cursor = self.train_db.find({'_id': {'$gt': 0}}, {'database': 1})
         list = []
         for item in cursor:
             if item['database'] not in list:
@@ -293,29 +230,29 @@ class ConfigurationIO:
         return list
 
     def getUntrainedDatabases(self):
-        cursor = self.config_db.find({'_id':{'$gt': 0}} , {'database':1})
+        cursor = self.config_db.find({'_id': {'$gt': 0}}, {'database': 1})
         list = []
         for item in cursor:
             if item['database'] not in list:
                 list.append(item['database'])
         return list
 
-
     def getUntrainedDatabasesGroupByCategory(self):
-        cursor = self.config_db.find({'_id': {'$gt': 0}}, {'database': 1,'category':1 })
+        cursor = self.config_db.find({'_id': {'$gt': 0}}, {'database': 1, 'category': 1})
         # list = [{"name": doc['database'], "category": doc['category']} for doc in cursor]
-        list=[]
+        list = []
         for item in cursor:
-            doc={"name": item['database'], "category": item['category']}
+            doc = {"name": item['database'], "category": item['category']}
             if doc not in list:
                 list.append(doc)
         return list
 
     def getSubmittedSentencesFromDatabase(self, database):
         text = 'database:' + database
-        trainCursor = self.train_db.find({"database": database},{"database":0,"id":0})
+        trainCursor = self.train_db.find({"database": database}, {"database": 0, "id": 0})
         data = [doc for doc in trainCursor]
         return data
+
 
 class TaskIO:
     def __init__(self):
@@ -328,26 +265,35 @@ class TaskIO:
         self.task_db = MongoClient('localhost', 20000).get_database("tokenizer_qiao").get_collection(
             'Tasks')
 
-    def getTaskInfoByCategory(self,category):
-        cursor = self.task_db.find({'category': category}, {'database': 1, 'category': 1, 'description':1,'tags':1,'timeAdded':1})
-        list=[]
+    def getTaskInfoByCategory(self, category):
+        cursor = self.task_db.find({'category': category},
+                                   {'database': 1, 'category': 1, 'description': 1, 'tags': 1, 'timeAdded': 1})
+        list = []
         for item in cursor:
             name = item['database']
-            finishedNum = self.train_db.find({'database':name}).count()
-            unfinishedNum = self.config_db.find({'database':name}).count()
-            rate = "%.2f%%" % (((float)(finishedNum)/(float)(finishedNum+unfinishedNum))*100)
+            finishedNum = self.train_db.find({'database': name}).count()
+            unfinishedNum = self.config_db.find({'database': name}).count()
+            rate = "%.2f%%" % (((float)(finishedNum) / (float)(finishedNum + unfinishedNum)) * 100)
             print(rate)
-            doc={"name": item['database'], "category": item['category'],"description": item['description'], "tags": item['tags'], "time": item['timeAdded'],"rate":rate}
+            doc = {"name": item['database'], "category": item['category'], "description": item['description'],
+                   "tags": item['tags'], "time": item['timeAdded'], "rate": rate}
             list.append(doc)
         return list
 
-    def updateTask(self,name,category,description):
-        self.task_db.find_one_and_update({'database':name},{'$set':{'category':category,'description':description}})
+    def getLabelsByTask(self, name):
+        cursor = self.task_db.find_one({'database': name}, {'tags': 1})
+        return cursor['tags']
+
+    def updateTask(self, name, category, description):
+        self.task_db.find_one_and_update({'database': name},
+                                         {'$set': {'category': category, 'description': description}})
+
+
+
 
 class UserIO:
     def __init__(self):
         self.db = MongoClient('localhost', 20000).get_database("tokenizer_qiao").get_collection('users')
-
 
     def insertUser(self, name, pwd, role):
         user = {}
@@ -359,14 +305,13 @@ class UserIO:
 
     def hasName(self, name, role):
         hasName = False
-        cursor = self.db.find({'role':role})
+        cursor = self.db.find({'role': role})
         for item in cursor:
             if item['name'] == name:
                 hasName = True
                 break
         return hasName
 
-    def getPwd(self, name,role):
+    def getPwd(self, name, role):
         pwd = self.db.find_one({'name': name, 'role': role})['pwd']
         return pwd
-

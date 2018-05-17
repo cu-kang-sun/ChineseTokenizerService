@@ -45,12 +45,12 @@ def load_ref(loadfile):
 
 nio = NotationIO()
 nio_cursor = nio.get_raw_randomly()
-cursor = None
-category = ''
+# cursor = None
+# category = ''
 configIO = ConfigurationIO()
 taskIO = TaskIO()
 userIO = UserIO()
-database = ''
+# database = ''
 
 @app.route('/login', methods=['POST'])
 def log_in():
@@ -162,21 +162,8 @@ def task_upload():
         response['status'] = 'success'
         return json.dumps(response, ensure_ascii=False)
 
-#查所有还没有被训练的数据库名称
-@app.route('/configuration/getDatabases', methods=['GET'])
-def choose_database():
-    database = configIO.getUntrainedDatabasesGroupByCategory()
-
-    return json.dumps(database)
 
 
-
-#查询标注-标签对照表
-@app.route('/configuration/getLabels', methods=['GET'])
-def fetch_label():
-    labels = configIO.getLabels()
-    print(json.dumps(labels,ensure_ascii=False))
-    return json.dumps(labels,ensure_ascii=False)
 
 #查询标注-标签对照表
 @app.route('/task/getTasksByCategory', methods=['POST'])
@@ -208,73 +195,36 @@ def update_task():
         return json.dumps(result,ensure_ascii=False)
 
 
-
-
-#按照类别查询标注-标签对照表
-@app.route('/configuration/getLabelsByCategory', methods=['POST'])
-def fetch_label_byCategory():
+#按照任务查询标签
+@app.route('/task/getLabelsByTask', methods=['POST'])
+def fetch_label_byTask():
     inputData = request.get_json()
-    category = inputData.get("category")
-    print("get labels by category:")
-    print(category)
+    name = inputData.get("name")
+    print("get labels by task:")
+    print(name)
 
-    labels = configIO.getLabelsByCategory(category)
+    labels = taskIO.getLabelsByTask(name)
     print(json.dumps(labels,ensure_ascii=False))
     return json.dumps(labels,ensure_ascii=False)
 
-
-
-@app.route('/configuration/submit-labeladded', methods=['POST'])
-def submit_labels_added():
-    inputData = request.get_json()
-    pairStr = inputData.get("newPair")
-    pair = json.loads(pairStr)
-    response={}
-    if(configIO.findLabel(pair['label'],pair['category']) != 0):
-        response['status']='fail'
-        response['msg']='已经存在一个名为'+pair['label']+'的标签， 请对您的标签进行重命名'
-        return json.dumps(response, ensure_ascii=False)
-    if (configIO.findMark(pair['notation'],pair['category']) != 0):
-        name=''
-        if(pair['category'] == 'notation'):
-            name='标注'
-        else:
-            name='分类'
-        response['status']='fail'
-        response['msg']='已经存在一个名为'+pair['notation']+'的'+ name +'， 请对您的标签进行重命名'
-        return json.dumps(response, ensure_ascii=False)
-
-
-    configIO.insertOneLabel(pair)
-    response['status'] = 'success'
-    response['msg'] = '上传成功'
-    return json.dumps(response, ensure_ascii=False)
+# #按照类别查询标注-标签对照表
+# @app.route('/configuration/getLabelsByCategory', methods=['POST'])
+# def fetch_label_byCategory():
+#     inputData = request.get_json()
+#     category = inputData.get("category")
+#     print("get labels by category:")
+#     print(category)
+#
+#     labels = configIO.getLabelsByCategory(category)
+#     print(json.dumps(labels,ensure_ascii=False))
+#     return json.dumps(labels,ensure_ascii=False)
 
 
 
-#开始标注，提交标签的对照表
-@app.route('/configuration/start-notation', methods=['POST'])
-def start_notation():
-    global cursor,database, category
-    inputData = request.get_json()
-    try:
-        database = inputData.get("database")
-        genre = inputData.get("category")
-        print(genre)
-        category = genre
-        print("now determine the global category!")
-        print(category)
-        cursor = nio.get_raw_randomly_fromDatabase(database)
-    except:
-        return "500"
-    else:
-        return "200"
 
 
-@app.route('/configuration/get-category', methods=['GET'])
-def get_category():
-    global category
-    return category
+
+
 
 
 @app.route('/notation', methods=['GET'])
@@ -283,9 +233,11 @@ def notation_page():
 
 
 #这里针对next(cursor)拿到的是空从而报错的情况做了一些处理
-@app.route('/notation/get-sentence', methods=['GET'])
+@app.route('/notation/get-sentence', methods=['POST'])
 def get_notation_sentence():
-    global cursor,database
+    inputData = request.get_json()
+    database = inputData.get("database")
+    cursor = nio.get_raw_randomly_fromDatabase(database)
     try:
         result = {}
         result['msg']=next(cursor)
@@ -295,7 +247,7 @@ def get_notation_sentence():
         size = nio.get_size_of_database(database)
         if size == 0:
             result={}
-            result['msg']="数据库'"+database+"'中的所有语句都已经被处理，现在返回配置界面"
+            result['msg']="数据库'"+database+"'中的所有语句都已经被处理，现在请返回任务界面"
             result['status']='fail'
             return json.dumps(result, ensure_ascii=False)
 
@@ -319,9 +271,6 @@ def export_notation_sentence():
     output = {}
     output['标注']={}
     output['分类']={}
-    output['标注']['标签']=configIO.getLabelExportByCategory('notation')
-    output['分类']['标签']=configIO.getLabelExportByCategory('classification')
-
 
     notation_content = {}
     classification_content={}

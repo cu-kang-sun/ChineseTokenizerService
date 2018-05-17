@@ -13,28 +13,28 @@
 //     }
 // };
 
-var colorList = ['lightblue','forestgreen','tomato', 'mediumslateblue','purple','mediumorchid ','peru ','plum ','darkred ','yellowgreen ','darkkhaki ','rosybrown ','pink','navy'];
+var colorList = ['lightblue', 'forestgreen', 'tomato', 'mediumslateblue', 'purple', 'mediumorchid ', 'peru ', 'plum ', 'darkred ', 'yellowgreen ', 'darkkhaki ', 'rosybrown ', 'pink', 'navy'];
 //
 // var labels = [];
 
-function copyJson(old)
-{
+function copyJson(old) {
     return JSON.parse(JSON.stringify(old));
 }
 
-function toTitleCase(str)
-{
-    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1);});
+function toTitleCase(str) {
+    return str.replace(/\w\S*/g, function (txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1);
+    });
 }
 
-function toOption(str)
-{
-    return 'is'+toTitleCase(str);
+function toOption(str) {
+    return 'is' + toTitleCase(str);
 }
 
-function toLabel(str)
-{
-    var labelStr = str.substring(2,str.length).replace(/\w\S*/g, function(txt){return txt.charAt(0).toLowerCase() + txt.substr(1);});
+function toLabel(str) {
+    var labelStr = str.substring(2, str.length).replace(/\w\S*/g, function (txt) {
+        return txt.charAt(0).toLowerCase() + txt.substr(1);
+    });
     return labelStr;
 }
 
@@ -42,6 +42,7 @@ function toLabel(str)
 var controller = new Vue({
     el: "#controller",
     data: {
+        database: null,
         action: "获取",
         // charsIndices: [],
         // protagonistFlags: [],
@@ -54,7 +55,8 @@ var controller = new Vue({
 
         start: null,
         end: null,
-        category:null,
+        category: null,
+
 
         notation: {
             x: 0,
@@ -74,150 +76,140 @@ var controller = new Vue({
     methods: {
 
 
-        initialData: function (){
+        initialData: function () {
             var self = this;
+            var url_string = window.location.href;
+            var url = new URL(url_string);
+            self.database = url.searchParams.get("database");
+            self.category=url.searchParams.get("category");
+            console.log("category:");
+            console.log(self.category);
             console.log('create vue now');
 
+
+            actionData = {};
+            actionData['name'] = self.database;
+            console.log("action data");
+            console.log(actionData);
             $.ajax({
-                url: "/configuration/get-category",
-                type: "get",
-                success: function (res) {
-                    console.log("get category success");
-                    console.log(res);
-                    self.category=res;
+                url: '/task/getLabelsByTask',
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify(actionData),
+                method: 'POST',
+                success: function (data) {
+                    console.log(data);
+                    //console.log(typeof(data));
+                    var jsonObj = null;
+                    if (typeof(jsonObj) === 'object') {
+                        jsonObj = data;
+                    } else {
+                        jsonObj = $.parseJSON(data);
+                    }
 
 
-                                actionData={};
-                                actionData['category']=self.category;
-                                console.log("action data");
-                                console.log(actionData);
-                                $.ajax({
-                                    url: '/configuration/getLabelsByCategory',
-                                    contentType: "application/json",
-                                    dataType: "json",
-                                    data: JSON.stringify(actionData),
-                                    method: 'POST',
-                                    success: function (data) {
-                                        console.log(data);
-                                        //console.log(typeof(data));
-                                        var jsonObj = null;
-                                        if(typeof(jsonObj) === 'object'){
-                                            jsonObj=data;
-                                        }else{
-                                            jsonObj = $.parseJSON(data);
-                                        }
+                    //var jsonObj = $.parseJSON(data);
+
+                    if (jsonObj.length > 14) {
+                        console.log('too many labels, the color used in the labels will be the same if the number of the notations is larger than 14');
+                        alert("too many labels, the color used in the labels will be the same if the number of the notations is larger than max ")
+                    }
+
+                    for (var i = 0; i < jsonObj.length; i++) {
+                        self.labelPairs.push(jsonObj[i]);
+                        self.labelChecks.push(toOption(jsonObj[i]['label']));
+                        self.emptyJson[jsonObj[i]['label']] = {};
+                        self.emptyJson[jsonObj[i]['label']]['contains'] = 'false';
+                        self.emptyJson[jsonObj[i]['label']]['names'] = [];
+                        self.colorPairs[jsonObj[i]['label']] = colorList[i % colorList.length];
+                    }
+
+                    ////////////////////////////////////////
+                    var sheets = document.styleSheets; // returns an Array-like StyleSheetList
+                    var sheet = document.styleSheets[0];
+
+                    for (let pair of self.labelPairs) {
+                        self.addCSSRule(sheet, '.' + pair['label'], 'background-color:' + self.colorPairs[pair['label']] + '; color: whitesmoke; ', 1);
+                    }
 
 
-                                        //var jsonObj = $.parseJSON(data);
-
-                                        if(jsonObj.length > 14) {
-                                            console.log('too many labels, the color used in the labels will be the same if the number of the notations is larger than 14');
-                                            alert("too many labels, the color used in the labels will be the same if the number of the notations is larger than max ")
-                                        }
-
-                                        for (var i=0; i < jsonObj.length; i++) {
-                                            self.labelPairs.push(jsonObj[i]);
-                                            self.labelChecks.push(toOption(jsonObj[i]['label']));
-                                            self.emptyJson[jsonObj[i]['label']] = {};
-                                            self.emptyJson[jsonObj[i]['label']]['contains'] = 'false';
-                                            self.emptyJson[jsonObj[i]['label']]['names'] = [];
-                                            self.colorPairs[jsonObj[i]['label']] = colorList[i%colorList.length];
-                                        }
-
-                                        ////////////////////////////////////////
-                                        var sheets = document.styleSheets; // returns an Array-like StyleSheetList
-                                        var sheet = document.styleSheets[0];
-
-                                        for (let pair of self.labelPairs) {
-                                            self.addCSSRule(sheet, '.' + pair['label'], 'background-color:' + self.colorPairs[pair['label']] + '; color: whitesmoke; ', 1);
-                                        }
+                    self.ciClass += "{peek:ci.isPeeked";
+                    for (let pair of self.labelPairs) {
+                        self.ciClass += "," + pair['label'] + ": " + "ci." + toOption(pair['label']);
+                    }
+                    self.ciClass += "}";
 
 
+                    /////////////////////////////////////
 
-                                        self.ciClass +=  "{peek:ci.isPeeked";
-                                        for (let pair of self.labelPairs) {
-                                            self.ciClass += "," + pair['label'] + ": " + "ci." + toOption(pair['label']);
-                                        }
-                                        self.ciClass += "}";
-
-
-                                        /////////////////////////////////////
-
-                                        console.log('ciclass');
-                                        console.log(self.ciClass);
-                                        console.log(self.labelPairs);
-                                        console.log(self.emptyJson);
-                                        console.log(JSON.stringify(self.emptyJson));
-                                        console.log(self.labelChecks);
-                                        console.log(self.colorPairs);
-                                        self.json = copyJson(self.emptyJson);
-                                    },
-                                    error: function (error) {
-                                        console.log(error);
-                                        alert("get labels err!");
-                                    }
-                                });
-
-
-
-
-
-                },error: function (error) {
+                    console.log('ciclass');
+                    console.log(self.ciClass);
+                    console.log(self.labelPairs);
+                    console.log(self.emptyJson);
+                    console.log(JSON.stringify(self.emptyJson));
+                    console.log(self.labelChecks);
+                    console.log(self.colorPairs);
+                    self.json = copyJson(self.emptyJson);
+                },
+                error: function (error) {
                     console.log(error);
-                    alert("get category err!")
+                    alert("get labels err!");
                 }
             });
-
 
 
             console.log('finish data initialization');
         },
 
         addCSSRule: function (sheet, selector, rules, index) {
-            if("insertRule" in sheet) {
+            if ("insertRule" in sheet) {
                 sheet.insertRule(selector + "{" + rules + "}", index);
             }
-            else if("addRule" in sheet) {
+            else if ("addRule" in sheet) {
                 sheet.addRule(selector, rules, index);
             }
         },
 
-        getClassObj:function(ci){
+        getClassObj: function (ci) {
 
 
         },
-        returnHome:function(){
-            window.location.href = "configuration.html";
+        returnHome: function () {
+            window.location.href = "/tasks.html?role=user";
         },
 
         getRawSentence: function () {
             var self = this;
             // self.action = "正在获取";
-            if(self.category == 'classification'){
-                if(document.getElementById("radioForm").querySelector('input[name="optionsRadios"]:checked') != null)
-                    document.getElementById("radioForm").querySelector('input[name="optionsRadios"]:checked').checked=false;
+            if (self.category == 'classification') {
+                if (document.getElementById("radioForm").querySelector('input[name="optionsRadios"]:checked') != null)
+                    document.getElementById("radioForm").querySelector('input[name="optionsRadios"]:checked').checked = false;
             }
 
             console.log("get raw sentence");
+            var actionData={};
+            actionData['database']=self.database;
             $.ajax({
                 url: "/notation/get-sentence",
+                contentType: "application/json",
                 dataType: "json",
-                type: "get",
+                data: JSON.stringify(actionData),
+                method: 'POST',
                 success: function (response) {
                     var str = null;
-                    if(typeof(response) === 'object'){
+                    if (typeof(response) === 'object') {
                         str = response;
-                    }else{
+                    } else {
                         str = JSON.parse(response);
                     }
 
                     console.log("get sentence result:");
                     console.log(str);
-                    var status=str['status'];
+                    var status = str['status'];
                     var res = str['msg'];
-                    if(status === 'fail'){
+                    if (status === 'fail') {
                         alert(res);
-                        window.location.href = "configuration.html";
+                        window.location.href = "/tasks.html?role=user";
                         return;
                     }
 
@@ -237,7 +229,6 @@ var controller = new Vue({
                     for (var key in self.emptyJson) {
                         self.json[key] = self.emptyJson[key];
                     }
-
 
 
                     //
@@ -260,9 +251,6 @@ var controller = new Vue({
                     // };
 
 
-
-
-
                     var chars = res.text.split("");
                     chars.forEach(function (char, index) {
                         var tmpJson = {};
@@ -275,7 +263,6 @@ var controller = new Vue({
                         tmpJson['status'] = '';
 
                         self.charInfos.push(tmpJson);
-
 
 
                     });
@@ -299,10 +286,10 @@ var controller = new Vue({
             for (var i = 0; i < this.length; i++) {
                 //this.charInfos[i].isPeeked = this.start !== null && this.end === null && i >= this.start && i <= index;
 
-                if(this.start !== null && this.end === null && i >= this.start && i <= index){
+                if (this.start !== null && this.end === null && i >= this.start && i <= index) {
                     this.charInfos[i].isPeeked = true;
                     this.charInfos[i].status = 'peek';
-                }else{
+                } else {
                     this.charInfos[i].isPeeked = false
                 }
 
@@ -336,25 +323,25 @@ var controller = new Vue({
             // this.action = "提交中";
             var self = this;
             var actionData = null;
-            if(self.category === 'notation'){
+            if (self.category === 'notation') {
                 console.log("now submit a notation work!");
-                actionData=self.json;
+                actionData = self.json;
                 actionData['category'] = 'notation';
-            }else{
+            } else {
                 console.log("now submit a classification work!");
-                actionData={};
-                actionData['_id']=self.json['_id'];
-                actionData['text']=self.json['text'];
+                actionData = {};
+                actionData['_id'] = self.json['_id'];
+                actionData['text'] = self.json['text'];
                 //actionData['database']=self.json['database'];
-                actionData['category']='classification';
-                if(document.getElementById("radioForm").querySelector('input[name="optionsRadios"]:checked') == null){
+                actionData['category'] = 'classification';
+                if (document.getElementById("radioForm").querySelector('input[name="optionsRadios"]:checked') == null) {
                     alert("请选择一个分类选项再提交！");
                     return;
                 }
-                var choice=document.getElementById("radioForm").querySelector('input[name="optionsRadios"]:checked').value;
+                var choice = document.getElementById("radioForm").querySelector('input[name="optionsRadios"]:checked').value;
 
-                console.log("radio choice:"+ choice);
-                actionData['genre']=choice;
+                console.log("radio choice:" + choice);
+                actionData['genre'] = choice;
             }
 
             $.ajax({
@@ -364,7 +351,7 @@ var controller = new Vue({
                 data: JSON.stringify(actionData),
                 type: "POST",
                 success: function (res) {
-                   // document.getElementById("radioForm").querySelector('input[name="optionsRadios"]:checked').checked=false;
+                    // document.getElementById("radioForm").querySelector('input[name="optionsRadios"]:checked').checked=false;
                     self.getRawSentence();
 
                 },
@@ -375,7 +362,7 @@ var controller = new Vue({
             });
         },
 
-        exportNotation: function(){
+        exportNotation: function () {
             var self = this;
 
             $.ajax({
@@ -388,9 +375,9 @@ var controller = new Vue({
                     // var obj = res.parseJSON();
                     //console.log(JSON.stringify(res));
 
-                     console.log("start export");
-                     self.download(res, 'result.txt', 'text/plain');
-                     //window.location.href = "configuration.html";
+                    console.log("start export");
+                    self.download(res, 'result.txt', 'text/plain');
+                    //window.location.href = "configuration.html";
 
                     //是否结束这次标注
                 },
@@ -400,7 +387,7 @@ var controller = new Vue({
             });
         },
 
-        download:function (text, name, type) {
+        download: function (text, name, type) {
             var a = document.createElement("a");
             var file = new Blob([text], {type: type});
             a.href = URL.createObjectURL(file);
@@ -441,14 +428,14 @@ var controller = new Vue({
 
 
             //handle stateName
-            if(stateName === 'cancel'){
+            if (stateName === 'cancel') {
                 setRange(this.start, this.end, null);
                 this.getJson();
 
-            }else{
+            } else {
                 var ifExist = 0;
                 for (let pair of self.labelPairs) {
-                    if(stateName === pair['label']){
+                    if (stateName === pair['label']) {
                         //console.log('statement');
                         //console.log(stateName);
 
@@ -459,7 +446,7 @@ var controller = new Vue({
                     }
                 }
 
-                if(ifExist == '0'){
+                if (ifExist == '0') {
                     console.error("no such field " + stateName);
                 }
             }
@@ -502,17 +489,15 @@ var controller = new Vue({
             /////////////////////////////////////todo
             var bufferJson = {};
             for (let labelCheck of self.labelChecks) {
-                 bufferJson[labelCheck] = {};
-                 bufferJson[labelCheck]['text'] = "";
-                 bufferJson[labelCheck]['start'] = null;
-                 bufferJson[labelCheck]['end'] = null;
+                bufferJson[labelCheck] = {};
+                bufferJson[labelCheck]['text'] = "";
+                bufferJson[labelCheck]['start'] = null;
+                bufferJson[labelCheck]['end'] = null;
             }
 
 
             //console.log('buffer json');
             //console.log(bufferJson);
-
-
 
 
             // var protagonistBuffer = {
@@ -537,12 +522,10 @@ var controller = new Vue({
             };
 
 
-
-
             for (var i = 0; i <= this.length; i++) {
 
                 var charInfo = this.charInfos[i];
-                if(i == this.length){
+                if (i == this.length) {
                     var emptyChecks = {};
                     for (let labelCheck of self.labelChecks) {
                         emptyChecks[labelCheck] = false;
@@ -551,72 +534,72 @@ var controller = new Vue({
                 }
 
                 for (let labelCheck of self.labelChecks) {
-                    if(charInfo[labelCheck]){
+                    if (charInfo[labelCheck]) {
                         if (bufferJson[labelCheck].start === null) {
                             bufferJson[labelCheck].start = i;
                         }
                         bufferJson[labelCheck].end = i;
                         bufferJson[labelCheck].text += charInfo.char;
-                    }else{
+                    } else {
                         if (bufferJson[labelCheck].end !== null) {
-                        // buff 有效
-                        this.json[toLabel(labelCheck)].names.push(bufferJson[labelCheck]);
-                        this.json[toLabel(labelCheck)].contains = true;
+                            // buff 有效
+                            this.json[toLabel(labelCheck)].names.push(bufferJson[labelCheck]);
+                            this.json[toLabel(labelCheck)].contains = true;
 
-                        bufferJson[labelCheck] = copyJson(emptyBuffer);
-
-
-                    }
-                    }
-                }
+                            bufferJson[labelCheck] = copyJson(emptyBuffer);
 
 
-/*
-
-                if (charInfo.isProtagonist) {
-                    if (protagonistBuffer.start === null) {
-                        protagonistBuffer.start = i;
-                    }
-                    protagonistBuffer.end = i;
-                    protagonistBuffer.text += charInfo.char;
-                } else {
-                    if (protagonistBuffer.end !== null) {
-                        // buff 有效
-                        this.json.protagonist.names.push(protagonistBuffer);
-                        this.json.protagonist.contains = true;
-                        protagonistBuffer = copyJson(emptyBuffer);
+                        }
                     }
                 }
 
-                if (charInfo.isLocation) {
-                    if (locationBuffer.start === null) {
-                        locationBuffer.start = i;
-                    }
-                    locationBuffer.end = i;
-                    locationBuffer.text += charInfo.char;
-                } else {
-                    if (locationBuffer.end !== null) {
-                        // buff 有效
-                        this.json.location.names.push(locationBuffer);
-                        this.json.location.contains = true;
-                        locationBuffer = copyJson(emptyBuffer);
-                    }
-                }
 
-                if (charInfo.isRegulation) {
-                    if (regulationBuffer.start === null) {
-                        regulationBuffer.start = i;
-                    }
-                    regulationBuffer.end = i;
-                    regulationBuffer.text += charInfo.char;
-                } else {
-                    if (regulationBuffer.end !== null) {
-                        // buff 有效
-                        this.json.regulation.names.push(regulationBuffer);
-                        this.json.regulation.contains = true;
-                        regulationBuffer = copyJson(emptyBuffer);
-                    }
-                }*/
+                /*
+
+                                if (charInfo.isProtagonist) {
+                                    if (protagonistBuffer.start === null) {
+                                        protagonistBuffer.start = i;
+                                    }
+                                    protagonistBuffer.end = i;
+                                    protagonistBuffer.text += charInfo.char;
+                                } else {
+                                    if (protagonistBuffer.end !== null) {
+                                        // buff 有效
+                                        this.json.protagonist.names.push(protagonistBuffer);
+                                        this.json.protagonist.contains = true;
+                                        protagonistBuffer = copyJson(emptyBuffer);
+                                    }
+                                }
+
+                                if (charInfo.isLocation) {
+                                    if (locationBuffer.start === null) {
+                                        locationBuffer.start = i;
+                                    }
+                                    locationBuffer.end = i;
+                                    locationBuffer.text += charInfo.char;
+                                } else {
+                                    if (locationBuffer.end !== null) {
+                                        // buff 有效
+                                        this.json.location.names.push(locationBuffer);
+                                        this.json.location.contains = true;
+                                        locationBuffer = copyJson(emptyBuffer);
+                                    }
+                                }
+
+                                if (charInfo.isRegulation) {
+                                    if (regulationBuffer.start === null) {
+                                        regulationBuffer.start = i;
+                                    }
+                                    regulationBuffer.end = i;
+                                    regulationBuffer.text += charInfo.char;
+                                } else {
+                                    if (regulationBuffer.end !== null) {
+                                        // buff 有效
+                                        this.json.regulation.names.push(regulationBuffer);
+                                        this.json.regulation.contains = true;
+                                        regulationBuffer = copyJson(emptyBuffer);
+                                    }
+                                }*/
 
                 // 最后冲一次缓存
                 // if (protagonistBuffer.end !== null) {
@@ -644,7 +627,7 @@ var controller = new Vue({
         }
     },
 
-    beforeMount(){
-            this.initialData()
+    beforeMount() {
+        this.initialData()
     }
 });

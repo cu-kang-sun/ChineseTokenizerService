@@ -20,12 +20,23 @@ function setModal(category, element) {
     document.getElementById('edit_time').value = time;
     var select = document.getElementById("database-type");
     select.value = category;
-
-
 }
 
 function startOperation(category, element) {
-
+    var len = element.parentNode.parentNode.parentNode.rowIndex - 1;
+    var tableId = category + "Table";
+    var tableRef = document.getElementById(tableId).getElementsByTagName('tbody')[0];
+    var cells = tableRef.rows[len].cells;
+    var dbname = cells[0].innerText;
+    var type = null;
+    if(category ==='notation'){
+        type='notation'
+    }else{
+        type='classification'
+    }
+    var url_str= "/notation.html?database="+dbname+"&category="+type;
+    console.log(url_str);
+    window.location=url_str;
 }
 
 
@@ -38,9 +49,16 @@ var tasks = new Vue({
     },
     methods: {
         initialTasks: function () {
+
             console.log("begin to initialize tasks!");
+
             var self = this;
-            self.role = 'manager';
+
+            var url_string = window.location.href;
+            var url = new URL(url_string);
+            var roleParam = url.searchParams.get("role");
+            self.role=roleParam;
+
             var postData = {};
             postData['category'] = 'notation';
             $.ajax({
@@ -94,27 +112,7 @@ var tasks = new Vue({
                 }
             });
         },
-        passValueToModal: function (category, element) {
-            var len = element.parentNode.parentNode.parentNode.rowIndex - 1;
-            alert(len);
-            console.log("now pass values to modal");
-            // var rowIndex = element.closest('tr').rowIndex
-            // alert(rowIndex);
-            // var tablename = category+"Table";
-            //
-            // var dbname = null;
-            // var description = null;
-            // var time = null;
-            // var category = null;
-            //
-            // document.getElementById('edit_dbname').value = dbname;
-            // document.getElementById('edit_description').value = description;
-            // document.getElementById('edit_time').value = time;
-            // var select = document.getElementById("database-type");
-            // select.value = category;
 
-
-        },
         updateTask: function () {
             var self = this;
             var dbname = document.getElementById('edit_dbname').value;
