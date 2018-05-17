@@ -38,9 +38,8 @@
             <div class="tab-content">
 
                 <div class="tab-pane fade active in" id="notation">
+
                     <div class="panel panel-default">
-
-
                         <div class="panel-body">
 
                             <div class="form-group">
@@ -67,9 +66,7 @@
                                         <span>请输入您要创建的数据库名字</span>
                                         <input id="notation-databaseName" class="form-control" name="databaseName"/>
                                         </br>
-                                        <span>请输入关于处理这个文本的任务的描述</span>
-                                        <input id="notation-description" class="form-control"/>
-                                        </br>
+
                                         <button type="button" class="btn btn-default"
                                                 v-on:click="uploadFile('notation');">上传
                                         </button>
@@ -123,6 +120,9 @@
 
                             </br>
                             <div>
+                                <span>请输入关于本次任务的描述</span>
+                                        <input id="notation-description" class="form-control"/>
+                                        </br>
                                 <button class="btn btn-default btn-success" v-on:click="startWork('notation');">上传标注任务
                                 </button>
                             </div>
@@ -159,9 +159,7 @@
                                         <span>请输入您要创建的数据库名字</span>
                                         <input id="class-databaseName" class="form-control" name="databaseName"/>
                                         </br>
-                                        <span>请输入关于处理这个文本的任务的描述</span>
-                                        <input id="class-description" class="form-control"/>
-                                        </br>
+
                                         <button type="button" class="btn btn-default" v-on:click="uploadFile('class');">
                                             上传
                                         </button>
@@ -220,9 +218,12 @@
 
                             </div>
 
-
+                            <div>
+                                        <span>请输入关于本次的任务的描述</span>
+                                        <input id="class-description" class="form-control"/>
+                                        </br>
                             <button class="btn btn-default btn-warning" v-on:click="startWork('class');">上传分类任务</button>
-
+                            </div>
                         </div>
                     </div>
                 </div>

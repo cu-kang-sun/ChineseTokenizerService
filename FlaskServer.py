@@ -3,7 +3,7 @@ from flask import request
 from flask import send_from_directory
 from flask import send_file
 
-from IO import RemoteIO, NotationIO, ConfigurationIO
+from IO import RemoteIO, NotationIO, ConfigurationIO, TaskIO
 from Network import CorpusGraph
 from Network import TextGraph
 from ResultReference import JiebaChecker, ThulacChecker
@@ -48,6 +48,7 @@ nio_cursor = nio.get_raw_randomly()
 cursor = None
 category = ''
 configIO = ConfigurationIO()
+taskIO = TaskIO()
 database = ''
 
 @app.route('/login', methods=['GET'])
@@ -92,15 +93,13 @@ def database_delete():
 def database_file_upload():
     response = {}
     name = request.form['name']
-    description = request.form['description']
     print('new database name:' + name)
     # if(len(name) == 0):
     #     response['status']='fail'
     #     response['msg']= "请对您要上传的数据库进行命名，否则您将无法上传"
     #     return json.dumps(response,ensure_ascii=False)
 
-    type = request.form['type']
-    print('new database type: ' + type)
+
 
 
     trainedDatabase = configIO.getTrainedDatabases()
@@ -128,7 +127,7 @@ def database_file_upload():
         lines.remove('')
 
     print( lines)
-    configIO.insertTextIntoDatabase(lines, name, type)
+    configIO.insertTextIntoDatabase(lines, name)
     response['status'] = 'success'
     response['msg'] = "上传文件成功，成功存入数据库！"
 
@@ -144,7 +143,8 @@ def task_upload():
         type = postData.get("category")
         dbname = postData.get("database")
         tag = postData.get("tags")
-        configIO.insertTask(dbname,type,tag)
+        description = postData.get("description")
+        configIO.insertTask(dbname,type,tag,description)
     except:
         response['status'] = 'fail'
         return json.dumps(response, ensure_ascii=False)
@@ -167,6 +167,38 @@ def fetch_label():
     labels = configIO.getLabels()
     print(json.dumps(labels,ensure_ascii=False))
     return json.dumps(labels,ensure_ascii=False)
+
+#查询标注-标签对照表
+@app.route('/task/getTasksByCategory', methods=['POST'])
+def fetch_task():
+    inputData = request.get_json()
+    category = inputData.get("category")
+    print("get tasks by category:")
+    print(category)
+#    tasks = configIO.get
+    tasks = taskIO.getTaskInfoByCategory(category)
+    print(json.dumps(tasks,ensure_ascii=False))
+    return json.dumps(tasks,ensure_ascii=False)
+
+#更新任务信息
+@app.route('/task/update', methods=['POST'])
+def update_task():
+    result ={}
+    try:
+        postData = request.get_json()
+        name = postData.get("name")
+        description = postData.get("description")
+        category = postData.get("category")
+        taskIO.updateTask(name,category,description)
+    except:
+        result['status'] = 'fail'
+        return json.dumps(result,ensure_ascii=False)
+    else:
+        result['status'] = 'success'
+        return json.dumps(result,ensure_ascii=False)
+
+
+
 
 #按照类别查询标注-标签对照表
 @app.route('/configuration/getLabelsByCategory', methods=['POST'])
@@ -210,7 +242,7 @@ def submit_labels_added():
 
 
 
-#开始标注，提交标签与标签的对照表
+#开始标注，提交标签的对照表
 @app.route('/configuration/start-notation', methods=['POST'])
 def start_notation():
     global cursor,database, category

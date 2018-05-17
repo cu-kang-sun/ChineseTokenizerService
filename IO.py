@@ -200,7 +200,7 @@ class ConfigurationIO:
         print('configuration initialization done')
 
 
-    def insertTextIntoDatabase(self, sentences,database,type):
+    def insertTextIntoDatabase(self, sentences,database):
         if(self.config_db.find().count() == 0 and self.train_db.find().count() == 0):
             max_id = 0
 
@@ -216,17 +216,18 @@ class ConfigurationIO:
 
 
 
-        sentence_state = [{"_id": index+1+max_id, "text": s, "database":database, "category":type} for index, s in enumerate(sentences)]
+        sentence_state = [{"_id": index+1+max_id, "text": s, "database":database} for index, s in enumerate(sentences)]
         saveJsonObj = json.dumps(sentence_state,ensure_ascii=False)
         print(saveJsonObj)
         #self.config_db.delete_many({})
         self.config_db.insert(json.loads(saveJsonObj))
 
 
-    def insertTask(self,databaseName, type, tags):
+    def insertTask(self,databaseName, type, tags,description):
         task = {}
         task['database']=databaseName
         task['category']=type
+        task['description'] = description
         task['tags']=tags
         task['timeAdded']=strftime("%Y-%m-%d %H:%M:%S", gmtime())
         self.task_db.insert(task)
@@ -315,3 +316,33 @@ class ConfigurationIO:
         trainCursor = self.train_db.find({"database": database},{"database":0,"id":0})
         data = [doc for doc in trainCursor]
         return data
+
+class TaskIO:
+    def __init__(self):
+        self.config_db = MongoClient('localhost', 20000).get_database("tokenizer_qiao").get_collection(
+            'TextLibrary')
+
+        self.train_db = MongoClient('localhost', 20000).get_database("tokenizer_qiao").get_collection(
+            'TextTrained')
+
+        self.task_db = MongoClient('localhost', 20000).get_database("tokenizer_qiao").get_collection(
+            'Tasks')
+
+    def getTaskInfoByCategory(self,category):
+        cursor = self.task_db.find({'category': category}, {'database': 1, 'category': 1, 'description':1,'tags':1,'timeAdded':1})
+        list=[]
+        for item in cursor:
+            name = item['database']
+            finishedNum = self.train_db.find({'database':name}).count()
+            unfinishedNum = self.config_db.find({'database':name}).count()
+            rate = "%.2f%%" % (((float)(finishedNum)/(float)(finishedNum+unfinishedNum))*100)
+            print(rate)
+            doc={"name": item['database'], "category": item['category'],"description": item['description'], "tags": item['tags'], "time": item['timeAdded'],"rate":rate}
+            list.append(doc)
+        return list
+
+    def updateTask(self,name,category,description):
+        self.task_db.find_one_and_update({'database':name},{'$set':{'category':category,'description':description}})
+
+
+

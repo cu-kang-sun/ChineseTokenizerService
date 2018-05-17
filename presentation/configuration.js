@@ -122,10 +122,7 @@ var app = new Vue({
                       return;
                   }
 
-                  if(document.getElementById(category+'-description').value.trim() === "") {
-                      alert("请输入关于任务的描述并且描述不能为空!");
-                      return;
-                  }
+
 
                   var name = document.getElementById(category+'-databaseName').value;;
                   if(name.trim() === "") {
@@ -136,7 +133,7 @@ var app = new Vue({
                       data.append('file', document.getElementById(category+'-file').files[0]);
                       data.append('name',name);
                       data.append('type',$("#tabs .active").attr('value'));
-                      data.append('description',document.getElementById(category+'-description').value);
+
 
 
 
@@ -298,6 +295,13 @@ var app = new Vue({
             var self = this;
             //收集所有的标签
             //收集文本库名称
+            //收集任务描述
+            var description = document.getElementById(category+'-description').value;
+            if(description.trim() === "") {
+                alert("请输入关于任务的描述并且描述不能为空!");
+                return;
+            }
+
             if(document.getElementById(category+'-presentDb').value.trim() === ""){
                 alert("目前尚未上传数据库，请上传数据库");
                 return;
@@ -325,6 +329,7 @@ var app = new Vue({
                 else
                     actionData['category'] = 'classification'
                 actionData['tags']=tags;
+                actionData['description'] = description;
                 console.log('actionData');
                 console.log(actionData);
 
@@ -347,7 +352,9 @@ var app = new Vue({
                             //clear all tables and inputs
 
                             document.getElementById(category+'-presentDb').value="";
+                            document.getElementById(category+'-description').value = "";
                             document.getElementById(category+"-upload").reset();
+
 
                             if(category === 'notation'){
                                 self.notationPairs = [];
