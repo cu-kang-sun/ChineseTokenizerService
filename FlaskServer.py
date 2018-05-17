@@ -3,7 +3,7 @@ from flask import request
 from flask import send_from_directory
 from flask import send_file
 
-from IO import RemoteIO, NotationIO, ConfigurationIO, TaskIO
+from IO import RemoteIO, NotationIO, ConfigurationIO, TaskIO,UserIO
 from Network import CorpusGraph
 from Network import TextGraph
 from ResultReference import JiebaChecker, ThulacChecker
@@ -49,9 +49,10 @@ cursor = None
 category = ''
 configIO = ConfigurationIO()
 taskIO = TaskIO()
+userIO = UserIO()
 database = ''
 
-@app.route('/login', methods=['GET'])
+@app.route('/login', methods=['POST'])
 def log_in():
     #传入数据
     #username 已做非空判断
@@ -64,9 +65,18 @@ def log_in():
     username = postData.get("username")
     pwd = postData.get("password")
     role=postData.get("role")
-
-
-    return;
+    response = {}
+    if userIO.hasName(username, role):
+        if userIO.getPwd(username, role) == pwd:
+            response['status'] = 'success'
+            response['msg'] = '登陆成功'
+        else:
+            response['status'] = 'fail'
+            response['msg'] = '密码错误'
+    else:
+        response['status'] = 'fail'
+        response['msg'] = '此角色下无该用户名'
+    return json.dumps(response,ensure_ascii=False);
 
 @app.route('/configuration', methods=['GET'])
 def notation_configuration():

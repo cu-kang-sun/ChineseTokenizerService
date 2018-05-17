@@ -34,15 +34,14 @@ var authenticator = new Vue({
                         response=JSON.parse(res);
                     }
                     if(response['status'] === 'success'){
-
+                        alert(response['msg']);
                     }else{
                         alert(response['msg']);
                     }
 
 
-                },
-                error: function (err) {
-                    alert("您的登陆出现错误，请稍后重试");
+                }, error: function (err) {
+                   alert("您的登陆出现错误，请稍后重试");
                     console.log(err);
                 }
             });

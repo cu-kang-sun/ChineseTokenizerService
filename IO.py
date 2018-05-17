@@ -344,5 +344,29 @@ class TaskIO:
     def updateTask(self,name,category,description):
         self.task_db.find_one_and_update({'database':name},{'$set':{'category':category,'description':description}})
 
+class UserIO:
+    def __init__(self):
+        self.db = MongoClient('localhost', 20000).get_database("tokenizer_qiao").get_collection('users')
 
+
+    def insertUser(self, name, pwd, role):
+        user = {}
+        user['name'] = name
+        user['pwd'] = pwd
+        user['role'] = role
+        print(user)
+        self.db.insert(user)
+
+    def hasName(self, name, role):
+        hasName = False
+        cursor = self.db.find({'role':role})
+        for item in cursor:
+            if item['name'] == name:
+                hasName = True
+                break
+        return hasName
+
+    def getPwd(self, name,role):
+        pwd = self.db.find_one({'name': name, 'role': role})['pwd']
+        return pwd
 
