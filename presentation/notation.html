@@ -10,76 +10,89 @@
     <title>Title</title>
 </head>
 <body>
-        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
-            <div class="navbar-header">
-                <a class="navbar-brand">文本标注辅助系统</a>
-            </div>
-            <!-- /.navbar-header -->
-        </nav>
+<nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+    <div class="navbar-header">
+        <a class="navbar-brand">文本标注辅助系统</a>
+    </div>
+    <!-- /.navbar-header -->
+</nav>
 
 <div id="controller">
     <div class="row">
         <div class="col-xs-8">
             <ul class="sentence">
 
-                <li v-bind:class="ci.status" @mouseenter="peek(ci.index);" @click="select(ci.index);" v-for="ci in charInfos" >{{ci.char}}</li>
+                <li v-bind:class="ci.status" @mouseenter="peek(ci.index);" @click="select(ci.index);"
+                    v-for="ci in charInfos">{{ci.char}}
+                </li>
 
-                    <!--
+                <!--
 {peek: ci.isPeeked, location: ci.isLocation, regulation: ci.isRegulation, protagonist: ci.isProtagonist}
 {peek:ci.isPeeked,protagonist:ci.isProtagonist,location:ci.isLocation,regulation:ci.isRegulation,project:ci.isProject}
-            -->
+        -->
             </ul>
-            <br />
-            <button class="btn btn-lg btn-warning" @click="getRawSentence();">获取</button>
-            <button class="btn btn-lg btn-primary" @click="submit();">提交</button>
-            <button class="btn btn-lg btn-success" @click="exportNotation();">结束标注并导出文本</button>
-            <button class="btn btn-lg btn-info" @click="returnHome();">返回配置页面</button>
+            <br/>
+            <div class="button-group">
+
+                <button class="btn btn-lg btn-warning" @click="getRawSentence();">获取</button>
+                <button class="btn btn-lg btn-primary" @click="submit();">提交</button>
+
+
+
+                <button class="btn btn-lg btn-success" @click="exportNotation();">结束标注并导出文本</button>
+                <button class="btn btn-lg btn-info" @click="returnHome();">返回任务页面</button>
+
+
+
+            </div>
+
+
         </div>
 
 
         <div class="col-xs-4">
-
             <template v-if="category === 'notation'">
-                <ul  v-for = "label in labelPairs" class="list-group">
+                <ul v-for="label in labelPairs" class="list-group">
                     <li style="list-style: none">{{ label.notation }}</li>
-                    <li class="list-group-item list-group-item-info" v-for="p in json[label.label].names">{{p.text}}</li>
+                    <li class="list-group-item list-group-item-info" v-for="p in json[label.label].names">{{p.text}}
+                    </li>
 
                 </ul>
             </template>
 
             <template v-if="category === 'classification'">
                 <label>分类选项</label>
-                    <form id="radioForm">
-
-                                            <div class="radio" v-for="label in labelPairs">
-                                                <label>
-                                                    <input type="radio" name="optionsRadios"  :value="label.label" >{{ label.notation }}
-                                                </label>
-                                            </div>
-
-                    </form>
-
+                <form id="radioForm">
+                    <div class="radio" v-for="label in labelPairs">
+                        <label>
+                            <input type="radio" name="optionsRadios" :value="label.label">{{ label.notation }}
+                        </label>
+                    </div>
+                </form>
 
 
             </template>
 
+
         </div>
+
+
     </div>
-    <br />
+    <br/>
 
-        <template v-if="category === 'notation'">
-            <button class="btn btn-lg btn-success" id="go-btn" @click="getRawSentence();">GO</button>
-            <ul class="notation" v-if="notation.visible" :style="{top: notation.y+'px', left:notation.x+'px'}">
-                <li>
-                    <button @click="setState('cancel');" class="btn btn-md btn-default">取&nbsp;&nbsp;消</button>
-                </li>
+    <template v-if="category === 'notation'">
+        <button class="btn btn-lg btn-success" id="go-btn" @click="getRawSentence();">GO</button>
+        <ul class="notation" v-if="notation.visible" :style="{top: notation.y+'px', left:notation.x+'px'}">
+            <li>
+                <button @click="setState('cancel');" class="btn btn-md btn-default">取&nbsp;&nbsp;消</button>
+            </li>
 
-                <li v-for="label in labelPairs">
-                    <button  @click="setState(label.label);" class="btn btn-md btn-primary">{{ label.notation}}</button>
-                </li>
+            <li v-for="label in labelPairs">
+                <button @click="setState(label.label);" class="btn btn-md btn-primary">{{ label.notation}}</button>
+            </li>
 
-            </ul>
-        </template>
+        </ul>
+    </template>
 
 </div>
 
